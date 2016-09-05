@@ -11,7 +11,7 @@
         <script src='//cdn.jsdelivr.net/sharepointplus/3.0.10/sharepointplus.min.js' type='text/javascript'></script>-->
 
         <!-- config file (json) -->
-        <script type="text/javascript" src="config/config.json"></script>
+       
         <script src="storage.js"></script>
         <script type="text/javascript">
 
@@ -21,7 +21,7 @@
 
                               
                 // 1. parse config.json
-                $.getJSON("config/config.json", function(data){
+                $.getJSON("resources/config.json", function(data){
                     $.each(data, function(key, val){
                         console.log(key, val);
                          
@@ -30,16 +30,17 @@
                 // 2. save config to localStorage
                 
                 
-                
-                var list = ['images/Slide1.png'
-                            , 'images/Slide2.png'
-                            , 'images/Slide3.png'
-                            , 'images/Slide4.png'
-                            , 'images/Slide5.png'
-                            , 'images/Slide6.png'
-                            , 'images/Slide7.png'
-                            , 'images/Slide8.png'
-                            , 'images/Slide9.png'];
+                // request sp retrieval
+                              
+                var list = ['public_html/img/test/Slide1.png'
+                            , 'public_html/img/test/Slide2.png'
+                            , 'public_html/img/test/Slide3.png'
+                            , 'public_html/img/test/Slide4.png'
+                            , 'public_html/img/test/Slide5.png'
+                            , 'public_html/img/test/Slide6.png'
+                            , 'public_html/img/test/Slide7.png'
+                            , 'public_html/img/test/Slide8.png'
+                            , 'public_html/img/test/Slide9.png'];
                         
                         
                         
@@ -99,7 +100,7 @@
 
                     } else if (myIndex >= imgs.length) {
 
-                        myIndex = 1;
+                        myIndex = 0;
                         clearTimeout(timeout);
                         document.getElementById("timer_container").style.display = "block";
                         timeout = setTimeout(slide, timerShowTime);
@@ -211,7 +212,7 @@
             </div> 
             <div id="timer_container" style="position:absolute;margin: auto;-webkit-animation: fadeIn 5s;animation: fadeIn 5s;" >
                 <!--width:50%;height:100%;overflow:hidden;display:none;position:absolute; -->
-                <object id="timer" type="text/html" data="timer.html"
+                <object id="timer" type="text/html" data="timer.php"
                         style="width: 100%;height:100%;">
                     <!-- max-width: 100%;
                          max-height: 100%; overflow:hidden;  -->

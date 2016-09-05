@@ -1,0 +1,7 @@
+{
+    "admin":[{"name": "qhb16114"}], 
+    "timezone":"",
+    "category":[{"name":"public holiday", "colour":"000000"}, {"name":"go live", "colour":"ff0000"}],
+    "sharepoint":[{"name":"Project Progress", "path":"https://moss.strath.ac.uk/infostratportal/SIMS/Ciber workspace"}],
+    "duedate":[{"number":"1","name":"SRM", "date":"01/09/2016", "category":"go live", "display":"N"},{"number":"2","name":"Admissions", "date":"17/09/2017", "category":"go live", "display":"Y"},{"number":"3", "name":"Curriculum Planning & Financials", "date":"18/04/2018", "category":"go live", "display":"Y"}]
+}

@@ -12,7 +12,7 @@
 
         <!-- config file (json) -->
        
-        <script src="storage.js"></script>
+        <script src="public_html/js/storage.js"></script>
         <script type="text/javascript">
 
 

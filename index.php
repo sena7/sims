@@ -73,9 +73,9 @@ and open the template in the editor.
             <div id="simsshow" class="section" style="background-color: antiquewhite;">
                 <a href="slideshow.php" style=" ">S</a></div>
             <div id="clock" class="section" style="background-color: lightcoral;">
-                <a href="" style="">I</a></div>
+                <a href="timer.php" style="">I</a></div>
             <div id="config" class="section" style="background-color: darkgrey;">
-                <a href="" style="display:block;width:100%;height:100%;font-size:10em;text-decoration: none;">M</a></div>
+                <a href="config.php" style="display:block;width:100%;height:100%;font-size:10em;text-decoration: none;">M</a></div>
             <div id="moments" class="section" style="background-color: thistle;">
                 <a href="" style="">S</a></div>
 

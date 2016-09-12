@@ -15,8 +15,9 @@ and open the template in the editor.
             }
             body{
                 width:100%;height:100%;
+                font-family: Impact, Charcoal, sans-serif;
             }
-            div{
+            div.vcenter{
             }
             .container{
                 display:                 flex;
@@ -25,7 +26,9 @@ and open the template in the editor.
                 -webkit-flex-wrap:       wrap;         /* Safari 8 */
                 justify-content:         center;
                 -webkit-justify-content: center;       /* Safari 8 */
+
             }
+
             .container div {
                 width:              150px;
                 height:             150px;
@@ -36,48 +39,91 @@ and open the template in the editor.
                 justify-content: center;
                 align-items: center;
 
-                position: relative;display:inline-block;width:880px;height:400px;padding:20px;
+                position: relative;
+                display:inline-block;
+                width:400px;height:400px;
+                padding:20px;
+            }
+            div.wrapper {
+
             }
             div.section{
-            }  
-            div.section:hover{
-                /*border:1px solid #009966;*/
-                opacity: 0.5;
-                filter: alpha(opacity=50); /* For IE8 and earlier */
+                padding: 25px;
+                margin: auto 0px auto 0px ;
                 background-repeat: no-repeat;
                 background-size: auto 100%;
                 background-position: center center;
+                background-origin: content-box;
+            }  
+            div.section:hover{
+                
+                opacity: 0.5;
+                filter: alpha(opacity=50);  
+                /*For IE8 and earlier*/ 
             }
             div.section a {
-                color: darkblue;
+                color: #f9f8f1;
                 display:block;width:100%;height:100%;font-size:10em;text-decoration: none;
             } 
+            div.section a:hover{
+                color:  #000000;
+
+            }
             div #simsshow:hover{
-                background-image: url('public_html/img/content/home_reel.png');
+                background-image: url('public_html/img/content/play.png');
+
             }
             div #clock:hover{
-                background-image: url('public_html/img/content/clock.png');
+               
+                background-image: url('public_html/img/content/clock_face.png');
+
+
             }
             div #config:hover{
-                background-image: url('public_html/img/content/gear.png');
+                
+                background-image: url('public_html/img/content/home_gear.png');
             }
-            div #moments:hover{
-                background-image: url('public_html/img/content/team01.jpg');
+           
+            div #sims:hover p a{
+                transition: color 1.5s ease;
+                color:#fffff;
+            }
+            p{
+                line-height:400px;margin:0px;
             }
         </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script>
+        
+        </script>
     </head>
     <body>
         <?php
+// include 'config.php';     
+        
+require('config.php');
+//$sql = "";
+//mysql_query($sql) or die('Error, delete query failed');
+
+
+// config.php custom function. 
+// $db_conn = connectDB();
+// if ($db_conn->connect_error) {
+//    die("Connection failed: " . $db_conn->connect_error);
+// } 
+// echo("<script>console.log($db_conn->server_version);</script>");
+
+
         ?>
         <div class="container" style="position: absolute; width:99%;height:95%;text-align:center;vertical-align: middle;">
-            <div id="simsshow" class="section" style="background-color: antiquewhite;">
-                <a href="slideshow.php" style=" ">S</a></div>
-            <div id="clock" class="section" style="background-color: lightcoral;">
-                <a href="timer.php" style="">I</a></div>
-            <div id="config" class="section" style="background-color: darkgrey;">
-                <a href="config.php" style="display:block;width:100%;height:100%;font-size:10em;text-decoration: none;">M</a></div>
-            <div id="moments" class="section" style="background-color: thistle;">
-                <a href="" style="">S</a></div>
+            <div id="simsshow" class="section" style="background-color:#2FAACE">
+                <p><a href="slideshow.php" style="">S</a></p></div>
+            <div id="clock" class="section" style="background-color: #4985D6;">
+                <p><a href="timer.php" style="">I</a></p></div>
+            <div id="config" class="section" style="background-color: #8ADCFF;">
+                <p><a href="system_config.php" style="">M</a></p></div>
+            <div id="sims" class="section" style="background-color: #8678E9;">
+                <p><a href="" style="" onmouseover="this.innerHTML = 'SIMS'" onmouseout="this.innerHTML='S'">S</a></p></div>
 
         </div>
     </body>

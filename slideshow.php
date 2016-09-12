@@ -202,7 +202,11 @@
         </title>    
 
     </head>
-    <body style="">
+    <body>
+        <?php
+         echo $_SERVER['HTTP_HOST'];
+         echo "<script>console.log($_SERVER.$GLOBALS);</script>";
+        ?>
         <div id = "container" style="">
             <div id="config" style="position:absolute; z-index: 1;text-align: right;margin: 0; padding:10px;"><input style="width:5%; max-width: 40px;outline:none;" type="image" src="https://s19.postimg.org/jd32a42f7/config.png" alt="config"/></div>
             <!--position:relative;overflow:hidden; -->

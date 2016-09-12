@@ -9,13 +9,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script type ="text/javascript">
-        
+
             var interval = null;
             var title;
             var value;
-            
-            $(document).ready(function(){});
-            
+
+            $(document).ready(function () {});
+
             window.onload = function () {
 
 
@@ -25,16 +25,14 @@
 
 // dateMs list for testing
                 var msList = [
-                
-                  Date.UTC(2016, 08, 01, 08, 00, 00),
-                   Date.UTC(2017, 08, 17, 08, 00, 00),
-                   Date.UTC(2018, 03, 18, 08, 00, 00),
-                   Date.UTC(2018, 07, 18, 08, 00, 00),
-                   Date.UTC(2018, 10, 18, 08, 00, 00),
+                    Date.UTC(2016, 08, 01, 08, 00, 00),
+                    Date.UTC(2017, 08, 17, 08, 00, 00),
+                    Date.UTC(2018, 03, 18, 08, 00, 00),
+                    Date.UTC(2018, 07, 18, 08, 00, 00),
+                    Date.UTC(2018, 10, 18, 08, 00, 00),
                 ];
 
                 var msMap = {
-                   
                     "SRM": Date.UTC(2016, 08, 01, 08, 00, 00),
                     "Admissions": Date.UTC(2017, 08, 17, 08, 00, 00),
                     "Curriculum Planning & Financials": Date.UTC(2018, 03, 18, 08, 00, 00),
@@ -108,7 +106,7 @@
                         size = minFontSize + fontSizeUnit * (i + 1);
                         e.style.cssText = 'font-size:' + size + 'em;';
                         var adjustedMonth = date.getMonth() + 1;
-                        
+
                         n = document.createTextNode(msMap.getKeyByValue(pastList[i]) + " " + getDecimalPrefix(date.getDate()) + date.getDate() + "/" + getDecimalPrefix(adjustedMonth) + adjustedMonth + "/" + date.getFullYear());
                         e.appendChild(n);
 
@@ -132,9 +130,9 @@
                         size = maxFontSize - fontSizeUnit * i;
                         e.style.cssText = "font-size:" + size + "em;";
                         var adjustedMonth = date.getMonth() + 1;
-                        
+
                         n = document.createTextNode(msMap.getKeyByValue(futureList[i])
-                                + " " +  getDecimalPrefix(date.getDate()) + date.getDate() + "/" + getDecimalPrefix(adjustedMonth) + adjustedMonth + "/" + date.getFullYear()
+                                + " " + getDecimalPrefix(date.getDate()) + date.getDate() + "/" + getDecimalPrefix(adjustedMonth) + adjustedMonth + "/" + date.getFullYear()
                                 //+ " " + date.getHours() + ":" + date.getMinutes()
                                 )
                         e.appendChild(n);
@@ -184,14 +182,14 @@
                 var nowMs = Date.now();
                 var futureMs = value;
 
-              /* Date.UTC() insert (uk local time - 1) to make UTC time. month index starts from 0, so for June, it is 5*/
+                /* Date.UTC() insert (uk local time - 1) to make UTC time. month index starts from 0, so for June, it is 5*/
 
 
                 if (futureMs > nowMs) {
 
                     var remainMs = futureMs - nowMs;
                     var remainDate = new Date(remainMs);
-                   
+
 
                     var getYears = remainDate.getUTCFullYear() - 1970;
                     var getMonths = remainDate.getUTCMonth();
@@ -207,7 +205,7 @@
                             , getMinutes
                             , getSeconds);
 
-                    document.getElementById("title").innerHTML = title + " " + "Go Live" ;
+                    document.getElementById("title").innerHTML = title + " " + "Go Live";
 
                     if (getYears > 0) {
                         if (document.getElementById("getYears").getAttribute("hidden") === true) {
@@ -222,34 +220,43 @@
 
                         if (getYears !== 1) {
                             document.getElementById("getYearsTag").innerHTML = "years";
-                        }else {
+                        } else {
                             document.getElementById("getYearsTag").innerHTML = "year";
                         }
                     } else {
-                        document.getElementById("getYears").setAttribute("hidden", true);
-                        document.getElementById("getYearsTag").setAttribute("hidden", true);
+                        document.getElementById("getYears").style.display = 'none';
+                        document.getElementById("getYearsTag").style.display = 'none';
                     }
 
 
                     if (getMonths > 0) {
-                        if (document.getElementById("getMonths").getAttribute("hidden") === true) {
-                            document.getElementById("getMonths").setAttribute("hidden", false);
+//                        if (document.getElementById("getMonths").getAttribute("hidden") === true) {
+//                            document.getElementById("getMonths").setAttribute("hidden", false);
+//
+//                        }
+//                        if (document.getElementById("getMonthsTag").getAttribute("hidden") === true) {
+//                            document.getElementById("getMonthsTag").setAttribute("hidden", false);
+//                        }
+                        if (document.getElementById("getMonths").style.display === 'none') {
+                            document.getElementById("getMonths").style.display = 'true';
+                        }
+                        if (document.getElementById("getMonthsTag").style.display === 'none') {
+                            document.getElementById("getMonthsTag").style.display = 'true';
+                        }
 
-                        }
-                        if (document.getElementById("getMonthsTag").getAttribute("hidden") === true) {
-                            document.getElementById("getMonthsTag").setAttribute("hidden", false);
-                        }
 
                         document.getElementById("getMonths").innerHTML = getMonths;
 
                         if (getMonths !== 1) {
                             document.getElementById("getMonthsTag").innerHTML = "months";
-                        }else{
-                              document.getElementById("getMonthsTag").innerHTML = "month";
+                        } else {
+                            document.getElementById("getMonthsTag").innerHTML = "month";
                         }
                     } else {
-                        document.getElementById("getMonths").setAttribute("hidden", true);
-                        document.getElementById("getMonthsTag").setAttribute("hidden", true);
+//                        document.getElementById("getMonths").setAttribute("hidden", true);
+//                        document.getElementById("getMonthsTag").setAttribute("hidden", true);
+                        document.getElementById("getMonths").style.display = 'none';
+                        document.getElementById("getMonthsTag").style.display = 'none';
                     }
 
                     if (getDays > 0) {
@@ -272,7 +279,7 @@
                         document.getElementById("getDays").setAttribute("hidden", true);
                         document.getElementById("getDaysTag").setAttribute("hidden", true);
                     }
-                    if(remainMs<86400000){
+                    if (remainMs < 86400000) {
                         document.getElementById("top").setAttribute("hidden", true);
                     }
 
@@ -354,10 +361,10 @@
                 }
             }
 
-            function getDecimalPrefix (decimal){
-                if(decimal < 10){
+            function getDecimalPrefix(decimal) {
+                if (decimal < 10) {
                     return "0";
-                }else {
+                } else {
                     return "";
                 }
             }
@@ -375,7 +382,14 @@
                 vertical-align: middle;
                 margin: auto;
                 text-align: center;
-               
+
+                margin:auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                position: relative;
+                display:inline-block;
             }
             #curruntTimer{
                 text-align:center;
@@ -387,14 +401,14 @@
             }
             .element {
                 display:inline-block;
-                
+                padding: 10px;
                 vertical-align: middle;
                 text-align: center;
-                
+
             }
             div {
-                
-}
+
+            }
         </style>
     </head>
 
@@ -437,7 +451,7 @@
                 </ul>
             </div>
 
-            <div style="text-align:center;position:relative;margin:0;color:#009966" id="currentTimer">
+            <div style="text-align:center;position:relative;margin:0;color:#ffffff; background-color: #5AB0DB;" id="currentTimer">
                 <div id="title" style="position: relative;"></div>
                 <div id="timerframe" style="top:0px;">
 
@@ -445,7 +459,7 @@
                     <div id = "top"> 
                         <div class="element" id="getYears"></div><div class="element" id="getYearsTag"></div>
                         <div class="element" id="getMonths"></div><div class="element" id="getMonthsTag"></div>
-                        <div  class="element" id="getDays"></div><div id="getDaysTag" class = "element" style="padding-left: 30px;"></div>
+                        <div  class="element" id="getDays"></div><div id="getDaysTag" class = "element" style=""></div>
 
 
                     </div>

@@ -1,0 +1,55 @@
+body{
+    width: 100%;
+    font-family: "Tw Cen MT", Monospace, 'Sans-serif';
+
+}
+#container{
+    width: 90%;
+    padding: 10px;
+}
+#configContents {
+    width: auto;
+    max-width: 1000px;
+    padding: 0px;
+}
+fieldset {
+    margin: 30px;
+    padding: 15px;
+    width: auto;
+}
+table {
+    width: auto;
+}
+tr {
+    width: 100%;
+}
+td {
+
+
+}
+.fontfamily {
+    font-family: "Tw Cen MT", Monospace, 'Sans-serif';
+
+
+}
+input[type="text"]{
+    border: 0px;
+}
+input[type="text"]:focus{
+    outline: none;
+    border:1px solid #5AB0DB;
+}
+
+legend{
+    padding: 0px 10px 0px 10px;
+}
+input {
+
+}
+
+#tb_selectedFiles {
+    padding: 10px;
+}
+#tb_selectedFiles td {
+    padding: 10px;
+}

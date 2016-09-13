@@ -444,7 +444,7 @@
 
             <div style="text-align:center;position:relative;margin:0;" id="currentTimer">
                 <div id="title" style="position: relative;color:#5AB0DB;background-color: #eaf5fa;"></div>
-                <div id="timerframe" style="top:0px;padding:;color:#eaf5fa; background-color: #5AB0DB;">
+                <div id="timerframe" style="top:0px;color:#eaf5fa; background-color: #5AB0DB;">
 
 
                     <div id = "top"> 
@@ -456,9 +456,7 @@
                     </div>
                     <div>
                         <div class="element" style="" id="getHours"></div>
-                        <!--                        <div class="element" id = "colon_hm" >&nbsp;&colon;</div>-->
-                        <div class="element" style="" id="getMinutes"></div>
-                        <!--                        <div class="element" id = "colon_ms" >&nbsp;&colon;</div>-->
+                    
                         <div class="element" style="" id="getSeconds"></div>
                     </div>
 

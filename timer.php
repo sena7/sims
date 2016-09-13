@@ -13,13 +13,9 @@
             var interval = null;
             var title;
             var value;
+            var numTimer = 1;
 
-            $(document).ready(function () {});
-
-            window.onload = function () {
-
-
-
+            $(document).ready(function () {
                 //window.onload = countdown;
 
 
@@ -123,8 +119,40 @@
                     var futureUl = document.getElementById("futureList");
                     var e, n;
 
-                    for (i = 0; i < futureList.length; i++) {
-                        date = new Date(futureList[i]);
+                    for (i = numTimer; i < futureList.length; i++) {
+                        var nowMs = Date.now();
+                        var futureMs = futureList[i];
+
+                        /* Date.UTC() insert (uk local time - 1) to make UTC time. month index starts from 0, so for June, it is 5*/
+
+
+
+
+                        var remainMs = futureMs - nowMs;
+                        date = new Date(remainMs);
+
+                        var getYears = date.getUTCFullYear() - 1970;
+                        var getMonths = date.getUTCMonth() + getYears * 12;
+                        var monthz = "";
+                        if (getMonths > 1) {
+                            monthz = "months";
+                        } else if (getMonths === 1) {
+                            monthz = "month";
+                        } else {
+
+                            monthz = "";
+                        }
+
+                        var getDays = date.getUTCDate() - 1;
+                        var dayz = "";
+                        if (getDays > 1) {
+                            dayz = "days";
+                        } else if (getDays === 1) {
+                            dayz = "day";
+                        } else {
+
+                            dayz = "";
+                        }
 
                         e = document.createElement("LI");
                         size = maxFontSize - fontSizeUnit * i;
@@ -132,9 +160,10 @@
                         var adjustedMonth = date.getMonth() + 1;
 
                         n = document.createTextNode(msMap.getKeyByValue(futureList[i])
-                                + " " + getDecimalPrefix(date.getDate()) + date.getDate() + "/" + getDecimalPrefix(adjustedMonth) + adjustedMonth + "/" + date.getFullYear()
+                                + " " + getDecimalPrefix(date.getDate()) + date.getDate() + "/" + getDecimalPrefix(adjustedMonth) + adjustedMonth + "/" + date.getFullYear() + " " + getMonths + monthz + " " + getDays + dayz
                                 //+ " " + date.getHours() + ":" + date.getMinutes()
-                                )
+
+                                );
                         e.appendChild(n);
 
                         futureUl.appendChild(e);
@@ -163,7 +192,9 @@
                     var container = document.getElementById("container");
                     container.appendChild(e);
                 }
+            });
 
+            window.onload = function () {
             };
 
 
@@ -208,26 +239,13 @@
                     document.getElementById("title").innerHTML = title + " " + "Go Live";
 
                     if (getYears > 0) {
-                        if (document.getElementById("getYears").getAttribute("hidden") === true) {
-                            document.getElementById("getYears").setAttribute("hidden", 'false');
+                        displayTrue("getYears");
 
-                        }
-                        if (document.getElementById("getYearsTag").getAttribute("hidden") === true) {
-                            document.getElementById("getYearsTag").setAttribute("hidden", false);
-                        }
+                        document.getElementById("getYears").innerHTML = getYears + (getYears !== 1 ? " years" : " year");
 
-                        document.getElementById("getYears").innerHTML = getYears;
-
-                        if (getYears !== 1) {
-                            document.getElementById("getYearsTag").innerHTML = "years";
-                        } else {
-                            document.getElementById("getYearsTag").innerHTML = "year";
-                        }
                     } else {
-                        document.getElementById("getYears").style.display = 'none';
-                        document.getElementById("getYearsTag").style.display = 'none';
+                        displayNone("getYears");
                     }
-
 
                     if (getMonths > 0) {
 //                        if (document.getElementById("getMonths").getAttribute("hidden") === true) {
@@ -237,50 +255,31 @@
 //                        if (document.getElementById("getMonthsTag").getAttribute("hidden") === true) {
 //                            document.getElementById("getMonthsTag").setAttribute("hidden", false);
 //                        }
-                        if (document.getElementById("getMonths").style.display === 'none') {
-                            document.getElementById("getMonths").style.display = 'true';
-                        }
-                        if (document.getElementById("getMonthsTag").style.display === 'none') {
-                            document.getElementById("getMonthsTag").style.display = 'true';
-                        }
+                        displayTrue("getMonths");
+
+                        document.getElementById("getMonths").innerHTML = getMonths + (getMonths !== 1 ? " months" : " month");
 
 
-                        document.getElementById("getMonths").innerHTML = getMonths;
-
-                        if (getMonths !== 1) {
-                            document.getElementById("getMonthsTag").innerHTML = "months";
-                        } else {
-                            document.getElementById("getMonthsTag").innerHTML = "month";
-                        }
                     } else {
 //                        document.getElementById("getMonths").setAttribute("hidden", true);
 //                        document.getElementById("getMonthsTag").setAttribute("hidden", true);
-                        document.getElementById("getMonths").style.display = 'none';
-                        document.getElementById("getMonthsTag").style.display = 'none';
+                         displayNone("getMonths");
+
                     }
 
                     if (getDays > 0) {
 
-                        if (document.getElementById("getDays").getAttribute("hidden") === true) {
-                            document.getElementById("getDays").setAttribute("hidden", false);
+                        displayTrue("getDays");
 
-                        }
-                        if (document.getElementById("getDaysTag").getAttribute("hidden") === true) {
-                            document.getElementById("getDaysTag").setAttribute("hidden", false);
-                        }
+                        document.getElementById("getDays").innerHTML = getDays + (getDays !== 1 ? " days" : " day");
 
 
-                        document.getElementById("getDays").innerHTML = getDays;
-
-                        if (getDays > 1) {
-                            document.getElementById("getDaysTag").innerHTML = "days";
-                        }
                     } else {
                         document.getElementById("getDays").setAttribute("hidden", true);
-                        document.getElementById("getDaysTag").setAttribute("hidden", true);
+
                     }
                     if (remainMs < 86400000) {
-                        document.getElementById("top").setAttribute("hidden", true);
+                         displayNone("top");
                     }
 
                     if (getHours > 0) {
@@ -288,17 +287,14 @@
 
                             var hours = (0).toString() + getHours.toString();
                             console.log(hours);
-                            document.getElementById("getHours").innerHTML = hours;
+                            document.getElementById("getHours").innerHTML = hours + "h";
                         } else {
-                            document.getElementById("getHours").innerHTML = getHours;
+                            document.getElementById("getHours").innerHTML = getHours + "h";
                         }
                     }
 
                     if (remainMs < 3600000) { // if the remaining time is less than an hour
-                        document.getElementById("getHours").setAttribute("hidden", true);
-                        document.getElementById("colon_hm").setAttribute("hidden", true);
-                        //  document.getElementById("colon_hm").innerHTML = "";
-                        document.getElementById("colon_hm").style.display = 'none';// error. change this
+                        displayNone("getHours");
                     }
 
 
@@ -306,10 +302,10 @@
                     if (getMinutes < 10 & getMinutes >= 0) {
 
                         var minutes = (0).toString() + getMinutes.toString();
-                        document.getElementById("getMinutes").innerHTML = minutes;
+                        document.getElementById("getMinutes").innerHTML = minutes + "m";
                     } else
                     {
-                        document.getElementById("getMinutes").innerHTML = getMinutes;
+                        document.getElementById("getMinutes").innerHTML = getMinutes + "m";
 
 
                     }
@@ -319,9 +315,9 @@
 
                     if (remainMs < 60000) { // if the remaining time is less than a minute
                         //document.getElementById("colon_ms").setAttribute("hidden", true);
-                        document.getElementById("colon_ms").style.display = "none";
+                        //document.getElementById("colon_ms").style.display = "none";
                         //document.getElementById("getMinutes").setAttribute("hidden", true);
-                        document.getElementById("getMinutes").style.display = "none";
+                        displayNone("getMinutes");
                     }
 
 
@@ -331,9 +327,9 @@
 
                         var seconds = (0).toString() + getSeconds.toString();
                         console.log(seconds);
-                        document.getElementById("getSeconds").innerHTML = seconds;
+                        document.getElementById("getSeconds").innerHTML = seconds + "s";
                     } else {
-                        document.getElementById("getSeconds").innerHTML = getSeconds;
+                        document.getElementById("getSeconds").innerHTML = getSeconds + "s";
 
                     }
 
@@ -369,8 +365,21 @@
                 }
             }
 
+            function displayNone(elementId) {
 
+                document.getElementById(elementId).style.display = 'none';
 
+            }
+            function displayTrue(elementId) {
+                document.getElementById(elementId).style.display = '';
+            }
+
+            function test(){
+                var mySQLDate = '2015-04-29 10:29:08';
+                var date = new Date(Date.parse(mySQLDate.replace('-','/','g')));
+
+                alert(date.getUTCMonth());
+            }
         </script>
 
         <style type="text/css">
@@ -406,80 +415,81 @@
                 text-align: center;
 
             }
-            div {
+            div.pastFuture {
+                margin:auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                position: relative;
+                display:inline-block;
 
             }
+
         </style>
     </head>
 
     <body>
 
-
-        <!--	   <table align="center" style="border: 0px; color:#000000;width:100%;height:100%;font-family:'Arial Black', Gadget, sans-serif;font-size:3.0em;margin:100px;">
-                   <tr><td>
-                       
-                       <table><tr><td>local time:&nbsp;</td><td id="localtime"></td></tr>
-                       <tr><td>Go Live Date:&nbsp;</td><td id="then0"></td></tr>
-                       </table>
-                   
-                    
-                   </td></tr>
-                   <tr>
-                     <td>
-                     <table align="center" style="font-size: 2.5em; font-family:'Arial Black', Gadget, sans-serif;">
-                         <thead >CS<span>Live</span></thead>
-                        <tbody>
-                        <tr>
-                             <td id="getYears">&nbsp;</td><td id="getYearsTag">year&nbsp;</td>  
-                             <td id="getMonths">&nbsp;</td><td id = "getMonthsTag">month&nbsp;</td>  
-                             <td id="getDays">&nbsp;</td><td id="getDaysTag">day&nbsp;</td>   
-                             <td id="getHours">00</td><td>:</td><td id="getMinutes">00</td><td>:</td><td id="getSeconds">00</td>
-                            
-                            
-                          
-                        </tr>
-                        </tbody>
-                     </table></td>
-                   </tr>
-                </table>-->
+ <?php
+ require('config.php');
+ $sql = "select name from date";
+     $result = mysql_query($sql);
+     echo(mysql_result($result, 0));
+ ?>
 
 
-        <div  id = "container" class="container" style="padding:0px;border: 0px; color:#000000;width:100%;height:100%;font-family:'Arial Black', Gadget, sans-serif; margin: 0 auto;">
-            <div id="pastTimer">
-                <ul id="pastList"  style="list-style: none;text-align: center;margin-top:0;margin-bottom: 0;margin-left:auto;margin-right:auto;padding:10px;">
-                    <li></li>
-                </ul>
-            </div>
+        <div  id = "container" class="container" style="padding:0px;border: 0px; color:#5AB0DB;width:100%;height:100%;max-height: 1020px;font-family:'Arial Black', Gadget, sans-serif; margin: 0 auto;">
+            <div><button onclick = "test();">test</button> </div>
 
-            <div style="text-align:center;position:relative;margin:0;color:#ffffff; background-color: #5AB0DB;" id="currentTimer">
-                <div id="title" style="position: relative;"></div>
-                <div id="timerframe" style="top:0px;">
+            <div style="text-align:center;position:relative;margin:0;" id="currentTimer">
+                <div id="title" style="position: relative;color:#5AB0DB;background-color: #eaf5fa;"></div>
+                <div id="timerframe" style="top:0px;padding:;color:#eaf5fa; background-color: #5AB0DB;">
 
 
                     <div id = "top"> 
-                        <div class="element" id="getYears"></div><div class="element" id="getYearsTag"></div>
-                        <div class="element" id="getMonths"></div><div class="element" id="getMonthsTag"></div>
-                        <div  class="element" id="getDays"></div><div id="getDaysTag" class = "element" style=""></div>
+                        <div class="element" id="getYears"></div>
+                        <div class="element" id="getMonths"></div>
+                        <div  class="element" id="getDays"></div>
 
 
                     </div>
                     <div>
-                        <div class="element" style="" id="getHours"></div><div class="element" id = "colon_hm" >&nbsp;&colon;</div>
-                        <div class="element" style="" id="getMinutes"></div><div class="element" id = "colon_ms" >&nbsp;&colon;</div>
+                        <div class="element" style="" id="getHours"></div>
+                        <!--                        <div class="element" id = "colon_hm" >&nbsp;&colon;</div>-->
+                        <div class="element" style="" id="getMinutes"></div>
+                        <!--                        <div class="element" id = "colon_ms" >&nbsp;&colon;</div>-->
                         <div class="element" style="" id="getSeconds"></div>
                     </div>
 
                 </div>
             </div>
+            <div id="pastFuture">
+
+                <div id="pastTimer" style="width:50%; float:left;">
+                    <div style="background-color: #f0eef7;color:#9d8fca;font-size: 0.5em;">Past</div>
+                    <div style="background-color: #9d8fca;color:#f0eef7;min-height: 200px;">
+                        <ul id="pastList"  style="list-style: none;text-align: center;margin-top:0;margin-bottom: 0;margin-left:auto;margin-right:auto;padding:10px;">
+                            <li></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="futureTimer" style="width:50%; float:left;">
+
+                    <div style="background-color:#e5f9f4 ;color:#8fcabd;font-size: 0.5em;">Future</div>
+                    <div style="background-color: #8fcabd;color:#e5f9f4;min-height: 200px;">
+                        <ul id="futureList"  style="list-style: none;text-align: center;margin-top:0;margin-bottom: 0;margin-left:auto;margin-right:auto;padding:10px;">
+
+                        </ul></div>
 
 
-
-            <div id="futureTimer">
-                <ul id="futureList"  style="list-style: none;text-align: center;margin-top:0;margin-bottom: 0;margin-left:auto;margin-right:auto;padding:10px;">
-
-                </ul>
-
+                </div>
             </div>
+       
+
+
+
 
         </div>
 

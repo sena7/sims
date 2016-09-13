@@ -1,5 +1,45 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
     "http://www.w3.org/TR/html4/strict.dtd">
+        <?php
+       
+//        if (!isset($_SESSION['count'])) {
+//            $_SESSION['count'] = 0;
+//        } else {
+//            $_SESSION['count'] ++;
+//        }
+        $timerDateList = [];  
+        $pastDateList = [];
+        $futureDateList = [];
+        class date {
+
+            public $category_id;
+            public $name;
+            public $date;
+            public $visible;
+
+        }
+
+        require('config.php');
+        $sql = "select category_id, name, date, visible from date order by date asc";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_CLASS, "date");
+        // var_dump($result);
+
+        $now = new DateTime(); // utc I think 20160913
+        print_r($now);
+        foreach ($result as $date) {
+           if( new DateTime($date->date) < $now){
+               array_push($pastDateList, $date);
+           }else {
+               array_push($futureDateList, $date);
+           }
+        }
+        
+        print_r($pastDateList);
+        print_r($futureDateList);
+        ?>
+
 <html>
     <head>
         <link rel="shortcut icon" href="">
@@ -10,24 +50,39 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script type ="text/javascript">
 
-            var interval = null;
-            var title;
-            var value;
-            var numTimer = 1;
-
+            var timerIntervals = [];
+            var numTimer = 2; // comes from setting/config. 
+            
             $(document).ready(function () {
-                //window.onload = countdown;
-
-
-// dateMs list for testing
-                var msList = [
-                    Date.UTC(2016, 08, 01, 08, 00, 00),
-                    Date.UTC(2017, 08, 17, 08, 00, 00),
-                    Date.UTC(2018, 03, 18, 08, 00, 00),
-                    Date.UTC(2018, 07, 18, 08, 00, 00),
-                    Date.UTC(2018, 10, 18, 08, 00, 00),
-                ];
-
+                                 
+                var futureDateList = <?php echo json_encode($futureDateList);?>;
+                console.log(futureDateList[0].date);
+                console.log(getJSDate(futureDateList[0].date));
+                console.log(getJSDate(futureDateList[0].date).getUTCFullYear());
+                console.log(getJSDate(futureDateList[0].date).getUTCMonth());
+                console.log(getJSDate(futureDateList[0].date).getUTCDate());
+                console.log(getJSDate(futureDateList[0].date).getUTCHours());
+                console.log(getJSDate(futureDateList[0].date).getUTCMinutes());
+                console.log(getJSDate(futureDateList[0].date).getUTCSeconds());
+                var MS = getJSDate(futureDateList[0].date).getTime();
+                console.log(getJSDate(futureDateList[0].date).getTime());
+                var remainMs = Date.now()-MS;
+                console.log(remainMs);
+                var ms = 1;
+                var s = ms*1000;
+                var m = s*60;
+                var h = m*60;
+                var d = h*24;
+                var y = d*365;
+                
+                console.log(y, d, h, m, s);
+                var day = remainMs/d;
+                var hour = (remainMs%d)/h;
+                var minute = ((remainMs%d)%h)/m;
+                var second = (((remainMs%d)%h)%m)/s;
+                console.log(day, hour, minute, second);
+                
+                
                 var msMap = {
                     "SRM": Date.UTC(2016, 08, 01, 08, 00, 00),
                     "Admissions": Date.UTC(2017, 08, 17, 08, 00, 00),
@@ -45,45 +100,30 @@
                 }
 
 
-                var numberOfTimer = 1;
                 var pastList = [];
                 var futureList = [];
+                var pastMap = {};
+                var futureMap = {};
 
-                var pastMap = [];
-                var futureMap = [];
-
-                console.log(msList.length);
-                console.log(msList.toString());
-
-                //function sortDatesMs() {
 
                 var now = Date.now();
-                for (i = 0; i < msList.length; i++) {
+                for (i = 0; i < msMap.length; i++) {
 
 
-                    if (msList[i] < now) {
-                        console.log(msList[i] < now);
-                        pastList.push(msList[i]);
+                    if (msMap[i].value < now) {
+                        console.log(msMap[i].value < now);
+                        pastMap.push(msMap[i]);
                     } else {
-                        futureList.push(msList[i]);
+                        futureList.push(msMap[i]);
                     }
                 }
-//            console.log(pastList.toString());    
-//             console.log(futureList.toString());    
-                pastList.sort(function (a, b) {
-                    return a - b
-                });
-                futureList.sort(function (a, b) {
-                    return a - b
-                });
-//            console.log(pastList.length);
-//            console.log(futureList.length);
-                console.log(pastList.toString());
-                console.log(futureList.toString());
-                //  }
 
-
-                //  function buildScreen() {
+//                pastList.sort(function (a, b) {
+//                    return a - b
+//                });
+//                futureList.sort(function (a, b) {
+//                    return a - b
+//                });
 
                 var maxFontSize = 0.4;
                 var minFontSize = 0.1;
@@ -176,12 +216,16 @@
 
 
                 if (futureList.length >= 1) {
+                    //2015-04-29 09:00:00
+
                     title = msMap.getKeyByValue(futureList[0]);
                     value = futureList[0];
-                    interval = setInterval(timer, 1000);
-                    timer();
+                    interval = setInterval(setTimer(new DueDate("DATE A", "2017-04-29 09:00:00", "category A", 1), ""), 1000);
+                    setTimer();
+
+
                 } else {
-                    document.getElementById("currentTimer").hidden = 'true';
+                    //document.getElementById("currentTimer").hidden = 'true';
 
 
                     var e = document.createElement("DIV");
@@ -190,7 +234,7 @@
                     e.appendChild(n);
 
                     var container = document.getElementById("container");
-                    container.appendChild(e);
+                    //  container.appendChild(e);
                 }
             });
 
@@ -208,13 +252,11 @@
             };
 
 
-            function timer() {
-                console.log('time:', value);
+
+            function setTimer(DueDate, templateDivElem) {
+
                 var nowMs = Date.now();
-                var futureMs = value;
-
-                /* Date.UTC() insert (uk local time - 1) to make UTC time. month index starts from 0, so for June, it is 5*/
-
+                var futureMs = getJSDate(DueDate.date);
 
                 if (futureMs > nowMs) {
 
@@ -222,64 +264,38 @@
                     var remainDate = new Date(remainMs);
 
 
-                    var getYears = remainDate.getUTCFullYear() - 1970;
-                    var getMonths = remainDate.getUTCMonth();
-                    var getDays = remainDate.getUTCDate() - 1;
-                    var getHours = remainDate.getUTCHours();
-                    var getMinutes = remainDate.getUTCMinutes();
-                    var getSeconds = remainDate.getUTCSeconds();
+                    var year = remainDate.getUTCFullYear() - 1970;
+                    var month = remainDate.getUTCMonth();
+                    var day = remainDate.getUTCDate() - 1;
+                    var hour = remainDate.getUTCHours();
+                    var minute = remainDate.getUTCMinutes();
+                    var second = remainDate.getUTCSeconds();
 
-                    console.log(getYears
-                            , getMonths
-                            , getDays
-                            , getHours
-                            , getMinutes
-                            , getSeconds);
 
-                    document.getElementById("title").innerHTML = title + " " + "Go Live";
-
-                    if (getYears > 0) {
-                        displayTrue("getYears");
-
-                        document.getElementById("getYears").innerHTML = getYears + (getYears !== 1 ? " years" : " year");
-
+                    templateDivElem.getElementByClass("title").innerHTML = DueDate.name + " " + "Go Live";
+                    var timer = templateDivElem.getElementByClass("timer");
+                    if (year > 0) {
+                        timer.getElementByClass("timer_year").style.display = "";
+                        timer.getElementByClass("timer_year").innerHTML = year + (year !== 1 ? " years" : " year");
                     } else {
-                        displayNone("getYears");
+                        timer.getElementByClass("timer_year").style.display = "none";
                     }
 
-                    if (getMonths > 0) {
-//                        if (document.getElementById("getMonths").getAttribute("hidden") === true) {
-//                            document.getElementById("getMonths").setAttribute("hidden", false);
-//
-//                        }
-//                        if (document.getElementById("getMonthsTag").getAttribute("hidden") === true) {
-//                            document.getElementById("getMonthsTag").setAttribute("hidden", false);
-//                        }
-                        displayTrue("getMonths");
-
-                        document.getElementById("getMonths").innerHTML = getMonths + (getMonths !== 1 ? " months" : " month");
-
-
+                    if (month > 0) {
+                        timer.getElementByClass("timer_month").style.display = "";
+                        timer.getElementByClass("timer_month").innerHTML = month + (month !== 1 ? " months" : " month");
                     } else {
-//                        document.getElementById("getMonths").setAttribute("hidden", true);
-//                        document.getElementById("getMonthsTag").setAttribute("hidden", true);
-                         displayNone("getMonths");
-
+                        timer.getElementByClass("timer_month").style.display = "none";
                     }
 
-                    if (getDays > 0) {
-
-                        displayTrue("getDays");
-
-                        document.getElementById("getDays").innerHTML = getDays + (getDays !== 1 ? " days" : " day");
-
-
+                    if (day > 0) {
+                        timer.getElementByClass("timer_day").style.display = "";
+                        timer.getElementByClass("timer_day").innerHTML = day + (day !== 1 ? " days" : " day");
                     } else {
-                        document.getElementById("getDays").setAttribute("hidden", true);
-
+                        timer.getElementByClass("timer_day").style.display = "none";
                     }
                     if (remainMs < 86400000) {
-                         displayNone("top");
+                        displayNone("top");
                     }
 
                     if (getHours > 0) {
@@ -356,6 +372,52 @@
 
                 }
             }
+            function createTimerTemplate(parentElemId, index, DueDate) {
+                var parent = document.getElementById(parentElemId);
+                var template = document.createElement('DIV');
+
+                template.dataset.sequence = index;
+
+                var title = document.createElement('DIV');
+                title.class = 'timer_title';
+//                var titleText = document.createTextNode(DueDate.name);
+//                title.appendChild(titleText);
+
+                var date = document.createElement('DIV');
+                date.class = 'timer_date';
+//                var dateText = document.createTextNode(DueDate.date);
+//                date.appendChild(dateText);
+
+                var timer = document.createElement('DIV');
+                timer.class = 'timer';
+                var year = document.createElement('DIV');
+                year.class = 'timer_year';
+                var month = document.createElement('DIV');
+                year.class = 'timer_month';
+                var day = document.createElement('DIV');
+                year.class = 'timer_day';
+                var hour = document.createElement('DIV');
+                year.class = 'timer_hour';
+                var minute = document.createElement('DIV');
+                year.class = 'timer_minute';
+                var second = document.createElement('DIV');
+                year.class = 'timer_second';
+
+                timer.appendChild(year);
+                timer.appendChild(month);
+                timer.appendChild(day);
+                timer.appendChild(hour);
+                timer.appendChild(minute);
+                timer.appendChild(second);
+
+
+                template.appendChild(title);
+                template.appendChild(date);
+                template.appendChild(timer);
+
+                parent.appendChild(template);
+                return template;
+            }
 
             function getDecimalPrefix(decimal) {
                 if (decimal < 10) {
@@ -374,12 +436,10 @@
                 document.getElementById(elementId).style.display = '';
             }
 
-            function test(){
-                var mySQLDate = '2015-04-29 10:29:08';
-                var date = new Date(Date.parse(mySQLDate.replace('-','/','g')));
-
-                alert(date.getUTCMonth());
+            function getJSDate(dbDateTime) {
+                return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
             }
+           
         </script>
 
         <style type="text/css">
@@ -431,65 +491,13 @@
 
     <body>
 
- <?php
- require('config.php');
- $sql = "select name from date";
-     $result = mysql_query($sql);
-     echo(mysql_result($result, 0));
- ?>
 
 
         <div  id = "container" class="container" style="padding:0px;border: 0px; color:#5AB0DB;width:100%;height:100%;max-height: 1020px;font-family:'Arial Black', Gadget, sans-serif; margin: 0 auto;">
-            <div><button onclick = "test();">test</button> </div>
 
-            <div style="text-align:center;position:relative;margin:0;" id="currentTimer">
-                <div id="title" style="position: relative;color:#5AB0DB;background-color: #eaf5fa;"></div>
-                <div id="timerframe" style="top:0px;color:#eaf5fa; background-color: #5AB0DB;">
-
-
-                    <div id = "top"> 
-                        <div class="element" id="getYears"></div>
-                        <div class="element" id="getMonths"></div>
-                        <div  class="element" id="getDays"></div>
-
-
-                    </div>
-                    <div>
-                        <div class="element" style="" id="getHours"></div>
-                    
-                        <div class="element" style="" id="getMinutes"></div>
-                       
-                        <div class="element" style="" id="getSeconds"></div>
-                    </div>
-
-                </div>
+            <div id ="timerContainer">
+             
             </div>
-            <div id="pastFuture">
-
-                <div id="pastTimer" style="width:50%; float:left;">
-                    <div style="background-color: #f0eef7;color:#9d8fca;font-size: 0.5em;">Past</div>
-                    <div style="background-color: #9d8fca;color:#f0eef7;min-height: 200px;">
-                        <ul id="pastList"  style="list-style: none;text-align: center;margin-top:0;margin-bottom: 0;margin-left:auto;margin-right:auto;padding:10px;">
-                            <li></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div id="futureTimer" style="width:50%; float:left;">
-
-                    <div style="background-color:#e5f9f4 ;color:#8fcabd;font-size: 0.5em;">Future</div>
-                    <div style="background-color: #8fcabd;color:#e5f9f4;min-height: 200px;">
-                        <ul id="futureList"  style="list-style: none;text-align: center;margin-top:0;margin-bottom: 0;margin-left:auto;margin-right:auto;padding:10px;">
-
-                        </ul></div>
-
-
-                </div>
-            </div>
-       
-
-
-
 
         </div>
 

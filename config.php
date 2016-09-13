@@ -1,106 +1,16 @@
 <?php
-//class dbconnection{
-//    // The database connection
-//    protected static $connection;
-//
-//    /**
-//     * Connect to the database
-//     * 
-//     * @return bool false on failure / mysqli MySQLi object instance on success
-//     */
-//    public function connect() {    
-//        // Try and connect to the database
-//        if(!isset(self::$connection)) {
-//            // Load configuration as an array. Use the actual location of your configuration file
-//            $config = parse_ini_file('./config.ini'); 
-//            self::$connection = new mysqli('localhost',$config['username'],$config['password'],$config['dbname']);
-//        }
-//
-//        // If connection was not successful, handle the error
-//        if(self::$connection === false) {
-//            // Handle error - notify administrator, log to a file, show an error screen, etc.
-//            return false;
-//        }
-//        return self::$connection;
-//    }
-//
-//    /**
-//     * Query the database
-//     *
-//     * @param $query The query string
-//     * @return mixed The result of the mysqli::query() function
-//     */
-//    public function query($query) {
-//        // Connect to the database
-//        $connection = $this -> connect();
-//
-//        // Query the database
-//        $result = $connection -> query($query);
-//
-//        return $result;
-//    }
-//
-//    /**
-//     * Fetch rows from the database (SELECT query)
-//     *
-//     * @param $query The query string
-//     * @return bool False on failure / array Database rows on success
-//     */
-//    public function select($query) {
-//        $rows = array();
-//        $result = $this -> query($query);
-//        if($result === false) {
-//            return false;
-//        }
-//        while ($row = $result -> fetch_assoc()) {
-//            $rows[] = $row;
-//        }
-//        return $rows;
-//    }
-//
-//    /**
-//     * Fetch the last error from the database
-//     * 
-//     * @return string Database error message
-//     */
-//    public function error() {
-//        $connection = $this -> connect();
-//        return $connection -> error;
-//    }
-//
-//    /**
-//     * Quote and escape value for use in a database query
-//     *
-//     * @param string $value The value to be quoted and escaped
-//     * @return string The quoted and escaped string
-//     */
-//    public function quote($value) {
-//        $connection = $this -> connect();
-//        return "'" . $connection -> real_escape_string($value) . "'";
-//    }
-//}
 
+$host = 'localhost';
+$db   = 'sims';
+$user = 'root';
+$pass = 'root';
+$charset = 'utf8';
 
-
-
-
-//function connectDB(){
-//    $username = "root";
-//   $password = "root";
-//   $servername = "localhost"; 
-//    $dbname="sims";
-//    $conn = $conn = new mysqli($servername, $username, $password, $dbname);
-//    return $conn;
-//}
-//    
-//  
-
-
-$username = "root";
-   $password = "root";
-   $servername = "localhost"; 
-    $dbname="sims";
-
-mysql_connect($servername, $username, $password) OR DIE('Unable to connect to database! Please try again later.');
-mysql_select_db($dbname);
-
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$opt = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => FALSE
+];
+$pdo = new PDO($dsn, $user, $pass, $opt);

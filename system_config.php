@@ -43,16 +43,16 @@ and open the template in the editor.
                 var table = document.getElementById(tableId);
                 table.deleteRow(0);
             }
-            
+
             function removeRow(tableId, index) {
-    var table = document.getElementById(tableId);
-    console.log("triggered ? ");
-    table.deleteRow(index);
-    var removed = fileArray.pop(index);
-    console.log(removed);
-    //then rearrange.
-  
-}
+                var table = document.getElementById(tableId);
+                console.log("triggered ? ");
+                table.deleteRow(index);
+                var removed = fileArray.pop(index);
+                console.log(removed);
+                //then rearrange.
+
+            }
         </script>
 
         <style>
@@ -120,17 +120,17 @@ and open the template in the editor.
                     <input id="configFormSubmit" type="button" value="save">
                 </form>
                 <!--<form action="system_config.php" name="f2"  method="post" enctype="multipart/form-data">-->
-                    <fieldset>
-                        <legend>Images</legend>
+                <fieldset>
+                    <legend>Images</legend>
 
 
-                        <input type="file" id="input_files" name="user_files[]" multiple="multiple" />
-                        <!--<output id="list"></output>-->
-                        <table id="tb_selectedFiles"></table>
-                        <input id="f2_submit" type="submit" value="save" name="submit" style="display: none;"/>
-                     
-                   
-                    </fieldset>
+                    <input type="file" id="input_files" name="user_files[]" multiple="multiple" />
+                    <!--<output id="list"></output>-->
+                    <table id="tb_selectedFiles"></table>
+                    <input id="f2_submit" type="submit" value="save" name="submit" style="display: none;"/>
+
+
+                </fieldset>
 
                 </form>
 
@@ -142,7 +142,7 @@ and open the template in the editor.
                         <tr id="c"><td>c</td></tr>
                         <tr id="d"><td>d</td></tr>
                     </tbody>
-                    <button onclick="deleteRow('tb_images',null)">delete</button>
+                    <button onclick="deleteRow('tb_images', null)">delete</button>
                 </table>
             </div>
 

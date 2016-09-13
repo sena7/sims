@@ -17,8 +17,7 @@ function Enum(constants) {
 
 }
 
-function DueDate(number, name, date, category, display) {
-    this.number = number;
+function DueDate(name, date, category, display) {
     this.name = name;
     this.date = date;
     this.category = category;
@@ -77,3 +76,4 @@ function getModel(name){
             
     }
 }
+

@@ -2,6 +2,7 @@ var fileArray = [];
 var onchangeCount = 0;
 
 $(document).ready(function () {
+    
 // check if the current user's browser supports File APIs
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         console.log("All the File APIs supported");
@@ -225,7 +226,7 @@ function handleFileSelect(inputFileId) {
     var newFileArray = [];
     var files = document.getElementById(inputFileId).files;// they are the users choice of each time
 
-    
+
 
 //var files = evt.target.files; // FileList object
     //var files = document.getElementsByTagName('input').files;
@@ -244,25 +245,25 @@ function handleFileSelect(inputFileId) {
 
     if (fileArrayLength === 0) {
         for (var i = 0, f; f = files[i]; i++) {
-             
-             newFileArray.push(f);
+
+            newFileArray.push(f);
         }
     } else {
         for (var i = 0, f; f = files[i]; i++) {
-          var exists = false;
-          var name = f.name;
-          var size = f.size;
-          var type = f.type;
-          for(var j= 0, e; e = fileArray[j]; j++){
-              if(name===e.name&&size===e.size&&type===e.type){
-                  exists = true;
-              }
-          }
-             
-          if(exists===false){
-                newFileArray.push(f);  
-          }
-           
+            var exists = false;
+            var name = f.name;
+            var size = f.size;
+            var type = f.type;
+            for (var j = 0, e; e = fileArray[j]; j++) {
+                if (name === e.name && size === e.size && type === e.type) {
+                    exists = true;
+                }
+            }
+
+            if (exists === false) {
+                newFileArray.push(f);
+            }
+
 
 
         }
@@ -278,7 +279,7 @@ function handleFileSelect(inputFileId) {
 
 
         console.log(f);
-        var row = table.insertRow(fileArray.length+i);
+        var row = table.insertRow(fileArray.length + i);
         var rowId = "row" + i;
         var rowClass = "delete";
         row.id = rowId;
@@ -305,7 +306,7 @@ function handleFileSelect(inputFileId) {
             sizeUnit = "Bytes";
         }
 
-        var sequence = document.createTextNode(fileArray.length+i+1);
+        var sequence = document.createTextNode(fileArray.length + i + 1);
         sequenceCell.appendChild(sequence);
         var name = document.createTextNode(escape(f.name));
         var size = document.createTextNode(imgSize + sizeUnit);
@@ -317,17 +318,19 @@ function handleFileSelect(inputFileId) {
         var t = document.createTextNode("remove");
         button.appendChild(t);
         button.setAttribute('data', "index: '" + i + "'");
-        button.addEventListener('click', function(){removeRow("tb_selectedFiles", i);}, false);
+        button.addEventListener('click', function () {
+            removeRow("tb_selectedFiles", i);
+        }, false);
         //button.onclick = function(){removeRow("tb_selectedFiles", i);};
         //removeFileRow("tb_selectedFiles", fileArray.length+i);
         removeCell.appendChild(button);
     }
 
-    for(var i=0, e; e=newFileArray[i]; i++){
+    for (var i = 0, e; e = newFileArray[i]; i++) {
         fileArray.push(e);
     }
 
-   
+
 }
 
 //             function handleFileSelect(evt) {
@@ -391,7 +394,7 @@ function removeRow(tableId, index) {
     var removed = fileArray.pop(index);
     console.log(removed);
     //then rearrange.
- 
+
 }
 function handleSaveButton(fileInputId, submitId) {
     var fileListLength = document.getElementById(fileInputId).files.length;

@@ -4,6 +4,23 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
+<?php
+
+class date {
+
+    public $category_id;
+    public $name;
+    public $date;
+    public $visible;
+
+}
+
+require('config.php');
+$selectDateSql = "select category_id, name, date, visible from date order by date asc ";
+$selectDateSqlStmt = $pdo->prepare($selectDateSql);
+$selectDateSqlStmt->execute();
+$selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
+?>
 <html>
     <head>
         <link rel="contents" href="resource/library/reference.html">
@@ -38,6 +55,11 @@ and open the template in the editor.
 
         <script src="public_html/js/system_config.js"></script> 
         <script type="text/javascript">
+            $(document).ready(function () {
+
+                var dates = <?php echo json_encode($selectDateResult); ?>;
+                console.log(dates);
+            });
 
             function deleteRow(tableId, rowId) {
                 var table = document.getElementById(tableId);
@@ -53,6 +75,7 @@ and open the template in the editor.
                 //then rearrange.
 
             }
+
         </script>
 
         <style>

@@ -108,11 +108,19 @@ foreach ($result as $row) {
 
         <script src="public_html/js/system_config.js"></script> 
         <script type="text/javascript">
+            //Global variables for data retrieval
             var dates;
             var dateCategories;
             var images;
+            
             $(document).ready(function () {
-
+                // check if the current user's browser supports File APIs
+                if (window.File && window.FileReader && window.FileList && window.Blob) {
+                    console.log("All the File APIs supported");
+                } else {
+                    alert('The File APIs are not fully supported in this browser.');
+                }
+                // data retrieved
                 dates = <?php echo json_encode($selectDateResult); ?>;
                 dateCategories = <?php echo json_encode($selectCatResult); ?>;
                 console.log(Object.keys(dates[0])[0]);
@@ -155,7 +163,7 @@ foreach ($result as $row) {
                     searching: false,
                     ordering: true,
                     columnDefs: [
-                        {"targets": [0, 1],
+                        {"targets": [0],
                             "visible": false}
                     ]
                 });
@@ -216,6 +224,9 @@ foreach ($result as $row) {
             }
             table{
                 text-align:left;
+            }
+            .slide_image:hover {
+                height: 300px;
             }
         </style>
     </head>

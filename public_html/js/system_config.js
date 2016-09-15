@@ -3,12 +3,7 @@ var onchangeCount = 0;
 
 $(document).ready(function () {
 
-// check if the current user's browser supports File APIs
-    if (window.File && window.FileReader && window.FileList && window.Blob) {
-        console.log("All the File APIs supported");
-    } else {
-        alert('The File APIs are not fully supported in this browser.');
-    }
+
 
 
     var inputFileId = "input_files";
@@ -42,32 +37,7 @@ $(document).ready(function () {
         });
         // console.log(localStorage);
     });
-    //set inner html values according to config data
-//    var categoriesJson = JSON.parse(localStorage.getItem("category"));
-//    setTableWithJsonArray("tb_category", categoriesJson);
-//    var spPathJson = JSON.parse(localStorage.getItem("sharepoint"));
-//    setTableWithJsonArray("tb_sharepoint", spPathJson);
-//    var duedatesJson = JSON.parse(localStorage.getItem("duedate"));
-//    setTableWithJsonArray("tb_dates", duedatesJson);
-
-
-
-
-    /* Data Table config*/
-
-//                 $('#tb_category').DataTable({
-//                    paging: false,
-//                    searching: false,
-//                    ordering: true
-//                });
-//                $('#tb_images').DataTable({
-//                    paging: true,
-//                    searching: false,
-//                    ordering: true,
-//                    rowReorder: true
-//                });
-
-
+ 
     /*Date Picker config*/
     $(".datepicker").datepicker(
             {
@@ -162,14 +132,7 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
         keys.push(headers[i].textContent);
     }
     console.log(keys);
-    // jquery   
-//                var keys = [];
-//                $('#' + tableId + '>thead>tr>td').each(function () {
-//                    console.log($(this).text());
-//                    keys.push($(this).text());
-//                });
 
-    // create a json object
     var jsonObj = {};
     var jsonValue = [];
     for (i = 1; i < rows.length; i++) {
@@ -193,20 +156,18 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
 
 function setTableWithData(tableId, list) {
 
-    console.log("reach ?");
+    console.log("fuction setTableWithData(", tableId,",", Object.keys(list[0]), ")");
+    
     var table = document.getElementById(tableId);
     var tbody = document.createElement("TBODY");
-    var fields = Object.keys(list[0]);
+    var labels = Object.keys(list[0]);
 
     var thead = document.createElement("THEAD");
     var tr = document.createElement("TR");
 
-
-
-
-    for (var i = 0; i < fields.length; i++) {
+    for (var i = 0; i < labels.length; i++) {
         var td = document.createElement("TH");
-        td.innerHTML = fields[i];
+        td.innerHTML = labels[i];
         tr.appendChild(td);
 
     }
@@ -217,21 +178,22 @@ function setTableWithData(tableId, list) {
         var obj = list[i];
         var row = tbody.insertRow();
         //row.id = "date" + i;
-        for (var j = 0; j < fields.length; j++) {
+        for (var j = 0; j < labels.length; j++) {
             var td = row.insertCell();
             var label = Object.keys(obj)[j];
             var child="";
 
-            if (label === "file") {
+            if (label === "file") {// file , currently just img. DOM img 
                 var img = document.createElement('IMG');
                 img.src = "data:image/jpeg;base64," + images[i].file;
-                img.height = "150";
+                img.height = "120";
+                img.class="slide_image";
                 child = img;
-            } else {
+            } else { // any other data type other than file. DOM input
                 var input = document.createElement("INPUT");
                 input.setAttribute("class", "fontfamily"); // it would not inherit the body font unless assigned to classes with the certain styles
                 input.setAttribute("name", Object.keys(obj)[j]);
-                var value = eval('obj.' + fields[j]);
+                var value = eval('obj.' + labels[j]);
                 if (label === "date") {
                     var date = getJSDate(value);
                     var adjustedMonth = date.getUTCMonth() + 1;
@@ -246,9 +208,9 @@ function setTableWithData(tableId, list) {
                     input.className += " jscolor"; // set class to jscolor.js colour picker // be aware of the space before the appending class name
                 }
 
-                if (label === "visible" && (eval('obj.' + fields[j]) === 1 || eval('obj.' + fields[j]) === 0)) {
+                if (label === "visible" && (eval('obj.' + labels[j]) === 1 || eval('obj.' + labels[j]) === 0)) {
                     input.setAttribute("type", "checkbox");
-                    if (eval('obj.' + fields[j]) === 1) {
+                    if (eval('obj.' + labels[j]) === 1) {
                         input.setAttribute("checked", true);
                     }
                 } else {

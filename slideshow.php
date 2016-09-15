@@ -1,3 +1,28 @@
+<?php
+
+class image {
+    public $file;
+}
+
+require('config.php');
+
+//$image_id = 2;
+//$sql = "SELECT file FROM image WHERE id=:id";
+$sql = "SELECT file FROM image where visible =1";
+$query = $pdo->prepare($sql);
+//$query->execute(array(':id' => $image_id));
+$query->execute();
+//$query->bindColumn(1, $name, PDO::PARAM_STR);
+//$query->bindColumn(2, $image, PDO::PARAM_LOB);
+//$result = $query->fetchAll(PDO::FETCH_BOUND);
+//$result = $query->fetchAll(PDO::FETCH_ASSOC);
+$result = $query->fetchAll(PDO::FETCH_CLASS, 'image');
+foreach ($result as $row) {
+    $row->file = base64_encode($row->file);
+}
+
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -15,36 +40,27 @@
         <script src="public_html/js/storage.js"></script>
         <script type="text/javascript">
 
-
+            var images;
 
             $(document).ready(function () {
-
-                              
+               
                 // 1. parse config.json
                 $.getJSON("resources/config.json", function(data){
                     $.each(data, function(key, val){
                         console.log(key, val);
-                         
                     });
                 });
                 // 2. save config to localStorage
-                
-                
-                // request sp retrieval
-                              
-                var list = ['public_html/img/test/Slide1.png'
-                            , 'public_html/img/test/Slide2.png'
-                            , 'public_html/img/test/Slide3.png'
-                            , 'public_html/img/test/Slide4.png'
-                            , 'public_html/img/test/Slide5.png'
-                            , 'public_html/img/test/Slide6.png'
-                            , 'public_html/img/test/Slide7.png'
-                            , 'public_html/img/test/Slide8.png'
-                            , 'public_html/img/test/Slide9.png'];
+                // 
+               
+               
+                images = <?php echo json_encode($result); ?>;
+                var list = [];
+                for(var i = 0; i<images.length; i++){
+                    list.push("data:image/jpeg;base64,"+ images[i].file);
+                }              
+                console.log(list);        
                         
-                        
-                        
-
                 var img_container = document.getElementById("img_container");
                 for (i = 0; i < list.length; i++) {
                     var img = document.createElement('IMG');
@@ -60,19 +76,12 @@
                 //console.log(list.toString());
 
                 //window.location.assign("timer.html");
-
-
-
                 var myIndex = 0;
 
                 var slideShowTime = 5000;
-                var timerShowTime = 20000;
+                var timerShowTime = 30000;
 
-                // var slideInterval = setInterval(carousel, 15000);
-
-                var turn = 0; // begin with slide show; put the order in the map
-
-
+              
                 var timeout;
                 var imgs = document.getElementsByClassName("mySlides");
                 console.log(imgs.length);
@@ -88,10 +97,6 @@
                         imgs[i].style.display = "none";
                     }
 
-
-
-
-                    console.log(myIndex);
                     if (myIndex < imgs.length) {
                         imgs[myIndex].style.display = "block";
                         document.getElementById("timer_container").style.display = "none";
@@ -105,33 +110,9 @@
                         document.getElementById("timer_container").style.display = "block";
                         timeout = setTimeout(slide, timerShowTime);
                     }
-
-
-
-
                 }
 
-                //var timeToSwitch = numImgs.length * timeoutMs;
-
-
-                //setInterval(switchToTimer, 3000);
-                //                function switchToTimer() {
-                //                    if (turn === 0) {
-                //                        document.getElementById("img_container").style.display = "block";
-                //                        document.getElementById("timer_container").style.display = "none";
-                //                     
-                //                    } else {
-                //                        document.getElementById("img_container").style.display = "none";
-                //                        document.getElementById("timer_container").style.display = "block";
-                //
-                //                    }
-                //
-                //                    if (turn === 0) {
-                //                        turn = 1;
-                //                    } else {
-                //                        turn = 0;
-                //                    }
-                //                }
+    
 
             }
 

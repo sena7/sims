@@ -8,18 +8,69 @@ and open the template in the editor.
 
 class date {
 
-    public $category_id;
+    public $id;
     public $name;
     public $date;
+    public $category_id;
+    public $visible;
+
+}
+
+class dateCategory {
+
+    public $id;
+    public $name;
+    public $colour;
+
+}
+
+class image {
+
+    public $id;
+    public $order_num;
+    public $file;
+    public $name;
     public $visible;
 
 }
 
 require('config.php');
-$selectDateSql = "select category_id, name, date, visible from date order by date asc ";
+$selectDateSql = "select id, category_id, name, date, visible from date order by date asc ";
 $selectDateSqlStmt = $pdo->prepare($selectDateSql);
 $selectDateSqlStmt->execute();
 $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
+
+
+$selectCatSql = "select id, name, colour from date_category";
+$selectCatSqlStmt = $pdo->prepare($selectCatSql);
+$selectCatSqlStmt->execute();
+$selectCatResult = $selectCatSqlStmt->fetchAll(PDO::FETCH_CLASS, "dateCategory");
+
+
+//$image_id = 2;
+//$sql = "SELECT file FROM image WHERE id=:id";
+$sql = "SELECT id, order_num, name, file, visible FROM image";
+$query = $pdo->prepare($sql);
+//$query->execute(array(':id' => $image_id));
+$query->execute();
+//$query->bindColumn(1, $name, PDO::PARAM_STR);
+//$query->bindColumn(2, $image, PDO::PARAM_LOB);
+//$result = $query->fetchAll(PDO::FETCH_BOUND);
+//$result = $query->fetchAll(PDO::FETCH_ASSOC);
+$result = $query->fetchAll(PDO::FETCH_CLASS, 'image');
+foreach ($result as $row) {
+    $row->file = base64_encode($row->file);
+}
+
+
+//while($row = $query->fetch(PDO::FETCH_ASSOC)){
+//  $name = $row['name'];
+//  $image = $row['file'];
+//  echo '<p>'.$name.'</p><img src="data:image/jpeg;base64,'.base64_encode($image).'" alt="Image" height="150px"/>';
+//}
+//var_dump($result->name);
+//header("Content-Type: image");
+//echo '<p>'.$name.'</p><img src="data:image/jpeg;base64,'.base64_encode($image).'" alt="Image" height="150px"/>';
 ?>
 <html>
     <head>
@@ -27,6 +78,7 @@ $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
         <link rel="shortcut icon" href="">
         <link rel="stylesheet" type="text/css" href="public_html/css/system_config.css">  
 
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
 
         <!--   Data Table    -->
         <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
@@ -49,16 +101,65 @@ $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
 
         <!-- color picker -->
         <script src="resources/library/jscolor.js"></script>
+
         <script src="public_html/js/models.js"></script>
         <script src="public_html/js/json.js"></script>
         <script src="public_html/js/storage.js"></script>
 
         <script src="public_html/js/system_config.js"></script> 
         <script type="text/javascript">
+            var dates;
+            var dateCategories;
+            var images;
             $(document).ready(function () {
 
-                var dates = <?php echo json_encode($selectDateResult); ?>;
-                console.log(dates);
+                dates = <?php echo json_encode($selectDateResult); ?>;
+                dateCategories = <?php echo json_encode($selectCatResult); ?>;
+                console.log(Object.keys(dates[0])[0]);
+                images = <?php echo json_encode($result); ?>;
+                console.log(images);
+                setTableWithData("tb_dates", dates);
+                setTableWithData("tb_category", dateCategories);
+                setTableWithData("tb_images", images);
+
+                $(".datepicker").datepicker(
+                        {
+                            dateFormat: 'dd/mm/yy'
+                        });
+
+                $(".accordion")
+                        .accordion({
+                            heightStyle: "content"
+                        });
+                $('#tb_dates').DataTable({
+                    paging: true,
+                    pagingType: 'simple_numbers',
+                    searching: false,
+                    ordering: true,
+                    columnDefs: [
+                        {"targets": [0],
+                            "visible": false}
+                    ]
+                });
+                $('#tb_category').DataTable({
+                    paging: false,
+                    searching: false,
+                    ordering: true,
+                    columnDefs: [
+                        {"targets": [0],
+                            "visible": false}
+                    ]
+                });
+                $('#tb_images').DataTable({
+                    paging: true,
+                    searching: false,
+                    ordering: true,
+                    columnDefs: [
+                        {"targets": [0, 1],
+                            "visible": false}
+                    ]
+                });
+
             });
 
             function deleteRow(tableId, rowId) {
@@ -76,11 +177,18 @@ $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
 
             }
 
+            function GoToHomePage()
+            {
+                window.location = 'index.php';
+            }
+
+
+
         </script>
 
         <style>
             input[type="button"], input[type="submit"], button{
-                background-color: #4CAF50; /* Green */
+                background-color: #00cccc; /* Green */
                 border: none;
                 color: white;
                 padding: 10px 15px;
@@ -92,84 +200,84 @@ $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
                 -webkit-border-radius: 5px;
 
             }
-
+            .accordion {
+                font-family: "Tw Cen MT", Monospace, 'Sans-serif';
+            }
+            .accordion .ui-accordion-content{
+                font-family: "Tw Cen MT", Monospace, 'Sans-serif';
+            }
+            .ui-accordion-header {
+                background-color: #afdfea; 
+                font-size: 35px;
+                /*font-family: "Tw Cen MT", Monospace, 'Sans-serif';*/
+            }
+            #configContents{
+                font-family: "Tw Cen MT", Monospace, 'Sans-serif';
+            }
+            table{
+                text-align:left;
+            }
         </style>
     </head>
     <body>
-        <?php
-        //session_start();
-
-        $imgs = array();
-        $target_dir = "public_html/img/test/";
-        $target = $target_dir . $_FILES['files']['name'];
-
-
-        $order = "1";
-        $files = ($_FILES['user_files']['name']);
-        $name = "test";
-        $visible = "Y";
-        $sqlInsertImage = "INSERT INTO 'image'('id', 'order', 'name', 'file', 'visible') VALUES (null,'$order','$files','$name','$visible')";
-        ?>
-        m
         <div id="container">
-            <div id="config" style=""><input style="width:20%; max-width: 40px;outline:none;" type="image" src="https://s19.postimg.org/llh8rg9j7/close.png" alt="config"/></div>
-            <div id="configContents">
-                <h2>Configuration</h2>
-                <input id="testButton" type="button" value="test1" onclick="getJsonObjFromTable('tb_dates', 'dates', 'input');"/>
-                <form id="configForm" onsubmit="" action="system_config.php" name="f1"  method="post" enctype="multipart/form-data">
-                    <fieldset>
-                        <legend>Dates</legend>
-                        <table id="tb_dates">
-                        </table>
-                    </fieldset>
+            <div><img src="public_html/img/content/play.png" width="50" onclick="GoToHomePage();" /></div>
+            <h2>Configuration</h2>
+            <div id="configContents" class="accordion">
+                <!---->
+                <!--<input id="testButton" type="button" value="test1" onclick="getJsonObjFromTable('tb_dates', 'dates', 'input');"/>-->
+                <!--<form id="configForm" onsubmit="" action="system_config.php" name="f1"  method="post" enctype="multipart/form-data">-->
+                <h3>Dates<h3>
+                        <div>
+                            <!--                    <fieldset>
+                                                    
+                                                    
+                                                    <legend>Dates</legend>-->
+                            <form>
+                                <table id="tb_dates">
+                                </table>
+                            </form>                       
+                            <!--</fieldset>-->
+                        </div>
+                        <h3>Category</h3>
+                        <div>
+                            <!--                    <fieldset>
+                                                    <legend>Category</legend>-->
+                            <table id = "tb_category">
+                            </table>
+                            <!--</fieldset>-->
 
-                    <fieldset>
-                        <legend>Category</legend>
-                        <table id = "tb_category">
-                        </table>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>Sharepoint folder path</legend>
-                        <table id="tb_sharepoint">
-
-                        </table>
-
-
-                    </fieldset>
-
-
-
-                    <input id="configFormSubmit" type="button" value="save">
-                </form>
-                <!--<form action="system_config.php" name="f2"  method="post" enctype="multipart/form-data">-->
-                <fieldset>
-                    <legend>Images</legend>
+                        </div>
 
 
-                    <input type="file" id="input_files" name="user_files[]" multiple="multiple" />
-                    <!--<output id="list"></output>-->
-                    <table id="tb_selectedFiles"></table>
-                    <input id="f2_submit" type="submit" value="save" name="submit" style="display: none;"/>
+
+                    <!--<input id="configFormSubmit" type="button" value="save">-->
+                        <!--</form>-->
+                        <!--<form action="system_config.php" name="f2"  method="post" enctype="multipart/form-data">-->
+                        <h3>Images</h3>
+                        <div>
+                            <!--                <fieldset>
+                                                <legend onclick="alert('hi');">Images</legend>-->
 
 
-                </fieldset>
+                            <input type="file" id="input_files" name="user_files[]" multiple="multiple" />
+                            <!--<output id="list"></output>-->
+                            <table id="tb_selectedFiles"></table>
+                            <input id="f2_submit" type="submit" value="save" name="submit" style="display: none;"/>
 
-                </form>
+                            <table id="tb_images">
 
-                <table id="tb_images">
-                    <thead><tr><th>head</th></tr></thead>
-                    <tbody>
-                        <tr id="a"><td>a</td></tr>
-                        <tr id="b"><td>b</td></tr>
-                        <tr id="c"><td>c</td></tr>
-                        <tr id="d"><td>d</td></tr>
-                    </tbody>
-                    <button onclick="deleteRow('tb_images', null)">delete</button>
-                </table>
-            </div>
+                                <!--<button onclick="deleteRow('tb_images', null)">delete</button>-->
+                            </table>
+
+                            <!--</fieldset>-->
+                        </div>
+                        <!--                </form>-->
 
 
-        </div>
-    </body>
-</html>
+                        </div>
+
+
+                        </div>
+                        </body>
+                        </html>

@@ -53,3 +53,11 @@ input {
 #tb_selectedFiles td {
     padding: 10px;
 }
+.returnButton {
+    width: 50px;
+    height: 50px; 
+    background: url(public_html/img/content/play.png) no-repeat;
+
+}
+
+

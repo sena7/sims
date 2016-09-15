@@ -16,7 +16,8 @@
         public $name;
         public $date;
         public $visible;
-
+        
+       
     }
 
     class system_config {
@@ -33,9 +34,9 @@
     $selectDateSqlStmt->execute();
     $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
     // var_dump($result);
-
+ 
     $now = new DateTime(); // utc I think 20160913
-    print_r($now);
+   
     foreach ($selectDateResult as $date) {
         if (new DateTime($date->date) < $now) {
             array_push($pastDateList, $date);
@@ -43,10 +44,7 @@
             array_push($futureDateList, $date);
         }
     }
-
-    print_r($pastDateList);
-    print_r($futureDateList);
-
+   
     // table system_config
     $selectSysConfigSql = "select num_timers from system_config";
     $selectSysConfigSqlStmt = $pdo->prepare($selectSysConfigSql);
@@ -57,8 +55,7 @@
        
         $systemConfig = $config;
     }
-     print_r($systemConfig);
-    // var_dump($result);
+   
     ?>
 
 <html>
@@ -70,6 +67,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="public_html/js/models.js"></script>
+      
         <script type ="text/javascript">
 
             var timerIntervals = [];
@@ -80,6 +78,8 @@
                 var pastDateList = <?php echo json_encode($pastDateList); ?>;
                 var futureDateList = <?php echo json_encode($futureDateList); ?>;
                 var config = <?php echo json_encode($systemConfig); ?>;
+               
+               
                 console.log(config);
                 numTimer = config.num_timers;
 

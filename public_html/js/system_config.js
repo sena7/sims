@@ -2,7 +2,7 @@ var fileArray = [];
 var onchangeCount = 0;
 
 $(document).ready(function () {
-    
+
 // check if the current user's browser supports File APIs
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         console.log("All the File APIs supported");
@@ -43,18 +43,18 @@ $(document).ready(function () {
         // console.log(localStorage);
     });
     //set inner html values according to config data
-    var categoriesJson = JSON.parse(localStorage.getItem("category"));
-    setTableWithJsonArray("tb_category", categoriesJson);
-    var spPathJson = JSON.parse(localStorage.getItem("sharepoint"));
-    setTableWithJsonArray("tb_sharepoint", spPathJson);
-    var duedatesJson = JSON.parse(localStorage.getItem("duedate"));
-    setTableWithJsonArray("tb_dates", duedatesJson);
+//    var categoriesJson = JSON.parse(localStorage.getItem("category"));
+//    setTableWithJsonArray("tb_category", categoriesJson);
+//    var spPathJson = JSON.parse(localStorage.getItem("sharepoint"));
+//    setTableWithJsonArray("tb_sharepoint", spPathJson);
+//    var duedatesJson = JSON.parse(localStorage.getItem("duedate"));
+//    setTableWithJsonArray("tb_dates", duedatesJson);
+
+
+
+
     /* Data Table config*/
-//                $('#tb_dates').DataTable({
-//                    paging: false,
-//                    searching: false,
-//                    ordering: true
-//                });
+
 //                 $('#tb_category').DataTable({
 //                    paging: false,
 //                    searching: false,
@@ -191,6 +191,81 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
     return jsonObj;
 }
 
+function setTableWithData(tableId, list) {
+
+    console.log("reach ?");
+    var table = document.getElementById(tableId);
+    var tbody = document.createElement("TBODY");
+    var fields = Object.keys(list[0]);
+
+    var thead = document.createElement("THEAD");
+    var tr = document.createElement("TR");
+
+
+
+
+    for (var i = 0; i < fields.length; i++) {
+        var td = document.createElement("TH");
+        td.innerHTML = fields[i];
+        tr.appendChild(td);
+
+    }
+
+    thead.appendChild(tr);
+    table.appendChild(thead);
+    for (var i = 0; i < list.length; i++) {
+        var obj = list[i];
+        var row = tbody.insertRow();
+        //row.id = "date" + i;
+        for (var j = 0; j < fields.length; j++) {
+            var td = row.insertCell();
+            var label = Object.keys(obj)[j];
+            var child="";
+
+            if (label === "file") {
+                var img = document.createElement('IMG');
+                img.src = "data:image/jpeg;base64," + images[i].file;
+                img.height = "150";
+                child = img;
+            } else {
+                var input = document.createElement("INPUT");
+                input.setAttribute("class", "fontfamily"); // it would not inherit the body font unless assigned to classes with the certain styles
+                input.setAttribute("name", Object.keys(obj)[j]);
+                var value = eval('obj.' + fields[j]);
+                if (label === "date") {
+                    var date = getJSDate(value);
+                    var adjustedMonth = date.getUTCMonth() + 1;
+
+                    value = date.getUTCDate() + "/" + adjustedMonth + "/" + date.getUTCFullYear();
+                    input.className += " datepicker"; // be aware of the space before the appending class name
+                    // input.setAttribute("data-date-format", "dd/mm/yyyy");
+                }
+                input.setAttribute("value", value);
+
+                if (label === "colour") { // if the key name is colour
+                    input.className += " jscolor"; // set class to jscolor.js colour picker // be aware of the space before the appending class name
+                }
+
+                if (label === "visible" && (eval('obj.' + fields[j]) === 1 || eval('obj.' + fields[j]) === 0)) {
+                    input.setAttribute("type", "checkbox");
+                    if (eval('obj.' + fields[j]) === 1) {
+                        input.setAttribute("checked", true);
+                    }
+                } else {
+                    input.setAttribute("type", "text");
+                }
+
+                child = input;
+            }
+             td.appendChild(child);
+        }
+
+    }
+    table.appendChild(tbody);
+}
+function getJSDate(dbDateTime) {
+    return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
+}
 function save() {
     var data = $("#configForm").serializeArray();
     console.log(data);
@@ -271,9 +346,6 @@ function handleFileSelect(inputFileId) {
 
     console.log(newFileArray.length);
 
-
-
-
     var table = document.getElementById('tb_selectedFiles');
     for (var i = 0, f; f = newFileArray[i]; i++) {
 
@@ -330,49 +402,7 @@ function handleFileSelect(inputFileId) {
         fileArray.push(e);
     }
 
-
 }
-
-//             function handleFileSelect(evt) {
-//                var files = evt.target.files; // FileList object
-//                // files is a FileList of File objects. List some properties.
-//                var list = document.getElementById('list');
-//                var ol = document.createElement('OL');
-//
-//                for (var i = 0, f; f = files[i]; i++) {
-//
-//
-//                    console.log(f);
-//                    var li = document.createElement('LI');
-//
-//                    var img = document.createElement('IMG');
-//                    img.id = "previews" + i;
-//                    img.height = "50";
-//                    img.alt = "img" + i;
-//                    var imgSize=0;
-//                    var sizeUnit="";
-//                    if (f.size >= 1000000) {
-//                        imgSize = Math.round((f.size/1000000)*10)/10;
-//                        sizeUnit = "MBs";
-//                    } else if (f.size < 1000000 && f.size > 1000) {
-//                        imgSize = Math.round(f.size/1000);
-//                        sizeUnit = "KBs"
-//                    } else {
-//                        imgSize = f.size();
-//                        sizeUnit = "Bytes"
-//                    }
-//                    var text = document.createTextNode(escape(f.name) + " " + imgSize + sizeUnit);
-//                    li.appendChild(text);
-//                    li.appendChild(img);
-//
-//                    ol.appendChild(li);
-//                    previewFile(f, img);
-//
-//                }
-//
-//                list.appendChild(ol);
-//
-//            }
 
 function previewFile(file, img) {
 
@@ -385,8 +415,6 @@ function previewFile(file, img) {
     }
 }
 
-
-
 function removeRow(tableId, index) {
     var table = document.getElementById(tableId);
     console.log("triggered ? ");
@@ -394,7 +422,6 @@ function removeRow(tableId, index) {
     var removed = fileArray.pop(index);
     console.log(removed);
     //then rearrange.
-
 }
 function handleSaveButton(fileInputId, submitId) {
     var fileListLength = document.getElementById(fileInputId).files.length;
@@ -418,7 +445,6 @@ function getFileArray(inputId) {
             console.log(f);
             fileArray.push(f);
         }
-
 
     }
     return fileArray;

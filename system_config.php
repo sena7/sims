@@ -115,11 +115,17 @@ foreach ($result as $row) {
         <!-- color picker -->
         <script src="resources/library/jscolor.js"></script>
 
+        <!-- flatpickr -->
+        <link rel="stylesheet" type="text/css" href="public_html/css/flatpickr.min.css">
+        <script src="resources/library/flatpickr.min.js"></script>
+
         <script src="public_html/js/models.js"></script>
         <script src="public_html/js/json.js"></script>
         <script src="public_html/js/storage.js"></script>
-
         <script src="public_html/js/system_config.js"></script> 
+
+
+
         <script type="text/javascript">
             //Global variables for data retrieval
             var dates;
@@ -141,7 +147,7 @@ foreach ($result as $row) {
                 images = <?php echo json_encode($result); ?>;
                 console.log(images);
                 misc = <?php echo json_encode($config); ?>;
-                 console.log(misc);
+                console.log(misc);
                 setTableWithArray("tb_dates", dates);
                 setTableWithArray("tb_category", dateCategories);
                 setTableWithArray("tb_images", images);
@@ -151,14 +157,16 @@ foreach ($result as $row) {
                         {
                             dateFormat: 'dd/mm/yy'
                         });
-
+                $(".flatpickr").flatpickr(
+                        {dateFormat: 'd/m/Y H:i:S'}
+                );
                 $(".accordion")
                         .accordion({
                             heightStyle: "content"
                         });
                 $('#tb_dates').DataTable({
                     paging: true,
-                    pagingType: 'simple_numbers',
+                    pagingType: 'numbers',
                     searching: false,
                     ordering: true,
                     columnDefs: [
@@ -178,6 +186,7 @@ foreach ($result as $row) {
                 $('#tb_images').DataTable({
                     paging: true,
                     searching: false,
+                    pagingType: 'numbers',
                     ordering: true,
                     columnDefs: [
                         {"targets": [0],
@@ -212,8 +221,11 @@ foreach ($result as $row) {
         </script>
 
         <style>
+            body{
+                font-family: "Tw Cen MT", Monospace, 'Sans-serif';
+            }
             input[type="button"], input[type="submit"], button{
-                background-color: #00cccc; /* Green */
+                background-color: #dbe7d5; /* Green */
                 border: none;
                 color: white;
                 padding: 10px 15px;
@@ -232,24 +244,51 @@ foreach ($result as $row) {
                 font-family: "Tw Cen MT", Monospace, 'Sans-serif';
             }
             .ui-accordion-header {
-                background-color: #afdfea; 
+                background-color: #6dbbbb; 
                 font-size: 35px;
+                font-weight: bold;
                 /*font-family: "Tw Cen MT", Monospace, 'Sans-serif';*/
             }
             #configContents{
                 font-family: "Tw Cen MT", Monospace, 'Sans-serif';
             }
-            table{
-                text-align:left;
-            }
             .slide_image:hover {
                 height: 300px;
+            }
+            h3{
+                font-weight: 200;
+            }
+            .dataTables_paginate.paging_numbers {
+
+            }
+            .paging_numbers{
+                border-style: none;
+            }
+            #tb_dates_paginate {
+
+            }
+            .paginate_button.current {
+
+            }
+
+            .ui-accordion-header-active {
+                border-style: none;
+            }
+            legend {
+                font-weight: bold;
+            }
+            .accordion div table{
+                text-align: left;
+                margin-left: 0; 
+            }
+            .dataTables_wrapper{
+                text-align:left;
             }
         </style>
     </head>
     <body>
         <div id="container">
-            <div><img src="public_html/img/content/play.png" width="50" onclick="GoToHomePage();" /></div>
+            <div><img src="public_html/img/content/left_arrow.png" width="50" onclick="GoToHomePage();" /></div>
             <h2>Configuration</h2>
             <div id="configContents" class="accordion">
                 <!---->
@@ -290,27 +329,32 @@ foreach ($result as $row) {
                     <!--<input id="configFormSubmit" type="button" value="save">-->
                         <!--</form>-->
                         <!--<form action="system_config.php" name="f2"  method="post" enctype="multipart/form-data">-->
+
                         <h3>Images</h3>
                         <div>
-                            <!--                <fieldset>
-                                                <legend onclick="alert('hi');">Images</legend>-->
 
+                            <div>
+                                <fieldset>
+                                    <legend>Upload</legend>
+                                    <div style="position: relative;">
+                                        <input type="file" id="input_files" name="user_files[]" multiple="multiple" style="padding: 20px;float:left;"/><input id="f2_submit" type="submit" value="upload" name="submit" style="display: none;float:left;"/>
+                                    </div>
+                                    <table id="tb_selectedFiles" ></table>
 
-                            <input type="file" id="input_files" name="user_files[]" multiple="multiple" />
-                            <!--<output id="list"></output>-->
-                            <table id="tb_selectedFiles"></table>
-                            <input id="f2_submit" type="submit" value="save" name="submit" style="display: none;"/>
-
-                            <table id="tb_images">
-
-                                <!--<button onclick="deleteRow('tb_images', null)">delete</button>-->
-                            </table>
-
-                            <!--</fieldset>-->
+                                </fieldset>
+                            </div>
+                            <fieldset>
+                                <legend>Saved images</legend>
+                                <div>
+                                <table id="tb_images">
+                                </table>
+                                </div>
+                            </fieldset>
                         </div>
-                        <!--                </form>-->
 
 
+                        <h3>Test</h3>
+                        <div><input class=flatpickr data-enable-time=true data-enable-seconds=true ></div>
                         </div>
 
 

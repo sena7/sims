@@ -37,7 +37,7 @@ $(document).ready(function () {
         });
         // console.log(localStorage);
     });
- 
+
     /*Date Picker config*/
     $(".datepicker").datepicker(
             {
@@ -156,8 +156,8 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
 
 function setTableWithArray(tableId, list) {
 
-    console.log("fuction setTableWithData(", tableId,",", Object.keys(list[0]), ")");
-    
+    console.log("fuction setTableWithData(", tableId, ",", Object.keys(list[0]), ")");
+
     var table = document.getElementById(tableId);
     var tbody = document.createElement("TBODY");
     var labels = Object.keys(list[0]);
@@ -165,11 +165,19 @@ function setTableWithArray(tableId, list) {
     var thead = document.createElement("THEAD");
     var tr = document.createElement("TR");
 
-    for (var i = 0; i < labels.length; i++) {
+    for (var i = 0; i < labels.length + 2; i++) {
         var td = document.createElement("TH");
-        td.innerHTML = labels[i];
+        var label = "";
+        if (i < labels.length) {
+
+             label = labels[i];
+        } else{
+             label = "delete";
+        }
+         
+        td.innerHTML = label;
         tr.appendChild(td);
-        
+
 
     }
 
@@ -182,13 +190,13 @@ function setTableWithArray(tableId, list) {
         for (var j = 0; j < labels.length; j++) {
             var td = row.insertCell();
             var label = Object.keys(obj)[j];
-            var child="";
+            var child = "";
 
             if (label === "file") {// file , currently just img. DOM img 
                 var img = document.createElement('IMG');
                 img.src = "data:image/jpeg;base64," + images[i].file;
                 img.height = "120";
-                img.class="slide_image";
+                img.class = "slide_image";
                 child = img;
             } else { // any other data type other than file. DOM input
                 var input = document.createElement("INPUT");
@@ -200,8 +208,8 @@ function setTableWithArray(tableId, list) {
                     var date = getJSDate(value);
                     var adjustedMonth = date.getUTCMonth() + 1;
 
-                    value = date.getUTCDate().toString() + "/" + (adjustedMonth<10?"0":"") + adjustedMonth.toString() + "/" + date.getUTCFullYear();
-                    value += " " + (date.getUTCHours()<10?"0":"") + date.getUTCHours().toString() + ":" + (date.getUTCMinutes()<10?"0":"") + date.getUTCMinutes().toString() + ":" + (date.getUTCSeconds()<10?"0":"") + date.getUTCSeconds();
+                    value = date.getUTCDate().toString() + "/" + (adjustedMonth < 10 ? "0" : "") + adjustedMonth.toString() + "/" + date.getUTCFullYear();
+                    value += " " + (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours().toString() + ":" + (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes().toString() + ":" + (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
                     input.className += " flatpickr"; // be aware of the space before the appending class name
                     input.dataset.enableTime = true;
                     input.dataset.enableSeconds = true;
@@ -224,17 +232,33 @@ function setTableWithArray(tableId, list) {
 
                 child = input;
             }
-             td.appendChild(child);
+            td.appendChild(child);
         }
 
+        var singleDeleteBtnCell = row.insertCell();
+        singleDeleteBtnCell.class = "deleteBtnCol";
+        var deleteImg = document.createElement('IMG');
+        deleteImg.class = "deleteButton";
+        deleteImg.src = "public_html/img/content/delete.png";
+        deleteImg.width = "20";
+        deleteImg.style.cursor ="pointer";
+        deleteImg.addEventListener('click', function(){alert('Delete, to be developed');}, false);
+        singleDeleteBtnCell.appendChild(deleteImg);
+
+        var multiDeleteBtnCell = row.insertCell();
+        multiDeleteBtnCell.class = "multiDeleteBtnCol";
+        var checkbox = document.createElement('input');
+        checkbox.class = "deleteCheck";
+        checkbox.type = "checkbox";
+        multiDeleteBtnCell.appendChild(checkbox);
     }
     table.appendChild(tbody);
 }
-function setTableWithObject(tableId, object){
+function setTableWithObject(tableId, object) {
     var table = document.getElementById(tableId);
     var labels = Object.keys(object);
     console.log(labels);
-    for(var i = 0; i<labels.length; i++){
+    for (var i = 0; i < labels.length; i++) {
         var row = table.insertRow();
         var label = row.insertCell(0);
         var cell = row.insertCell(1);

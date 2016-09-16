@@ -169,6 +169,7 @@ function setTableWithArray(tableId, list) {
         var td = document.createElement("TH");
         td.innerHTML = labels[i];
         tr.appendChild(td);
+        
 
     }
 
@@ -191,17 +192,20 @@ function setTableWithArray(tableId, list) {
                 child = img;
             } else { // any other data type other than file. DOM input
                 var input = document.createElement("INPUT");
-                input.setAttribute("class", "fontfamily"); // it would not inherit the body font unless assigned to classes with the certain styles
-                input.setAttribute("name", Object.keys(obj)[j]);
+                input.style.fontFamily = "inherit";
+                //'Tw Cen MT', Monospace, 'Sans-serif'
+                input.name = Object.keys(obj)[j];
                 var value = eval('obj.' + labels[j]);
                 if (label === "date") {
                     var date = getJSDate(value);
                     var adjustedMonth = date.getUTCMonth() + 1;
 
                     value = date.getUTCDate().toString() + "/" + (adjustedMonth<10?"0":"") + adjustedMonth.toString() + "/" + date.getUTCFullYear();
-                    input.className += " datepicker"; // be aware of the space before the appending class name
-                    // input.setAttribute("data-date-format", "dd/mm/yyyy");
-                    input.addEventListener('change', function(){alert(input.value);});
+                    value += " " + (date.getUTCHours()<10?"0":"") + date.getUTCHours().toString() + ":" + (date.getUTCMinutes()<10?"0":"") + date.getUTCMinutes().toString() + ":" + (date.getUTCSeconds()<10?"0":"") + date.getUTCSeconds();
+                    input.className += " flatpickr"; // be aware of the space before the appending class name
+                    input.dataset.enableTime = true;
+                    input.dataset.enableSeconds = true;
+                    input.dataset.weekNumbers = true;
                 }
                 input.setAttribute("value", value);
 
@@ -407,8 +411,8 @@ function removeRow(tableId, index) {
     //then rearrange.
 }
 function handleSaveButton(fileInputId, submitId) {
-    var fileListLength = document.getElementById(fileInputId).files.length;
-    if (fileListLength > 0) {
+//    var fileListLength = document.getElementById(fileInputId).files.length;
+    if (fileArray.length > 0) {
         document.getElementById(submitId).style.display = 'block';
     } else {
         document.getElementById(submitId).style.display = 'none';

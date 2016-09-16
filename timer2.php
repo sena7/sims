@@ -20,10 +20,10 @@
        
     }
 
-    class system_config {
-
-        public $num_timers;
-
+    class config {
+    public $num_timer;
+    public $slide_show_sec;
+    public $timer_show_sec;
     }
 
     require('config.php');
@@ -46,16 +46,11 @@
     }
    
     // table system_config
-    $selectSysConfigSql = "select num_timers from system_config";
+    $selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec from system_config where id=(select max(id) from system_config) LIMIT 1";
     $selectSysConfigSqlStmt = $pdo->prepare($selectSysConfigSql);
     $selectSysConfigSqlStmt->execute();
-    $selectSysConfigResult = $selectSysConfigSqlStmt->fetchAll(PDO::FETCH_CLASS, "system_config");
-    
-    foreach ($selectSysConfigResult as $config) {
-       
-        $systemConfig = $config;
-    }
-   
+    $selectSysConfigResult = $selectSysConfigSqlStmt->fetchAll(PDO::FETCH_CLASS, "config");
+    $config = $selectSysConfigResult[0];
     ?>
 
 <html>
@@ -72,18 +67,19 @@
 
             var timerIntervals = [];
             var timerTemplateList = [];
-            var numTimer=0; // comes from setting/config. 
+            var config; // comes from setting/config. 
 
             $(document).ready(function () {
                 var pastDateList = <?php echo json_encode($pastDateList); ?>;
                 var futureDateList = <?php echo json_encode($futureDateList); ?>;
-                var config = <?php echo json_encode($systemConfig); ?>;
+                var config = <?php echo json_encode($config); ?>;
                
                
                 console.log(config);
-                numTimer = config.num_timers;
+                console.log(config.num_timer);
+                
 
-                for (var i = 0; i < numTimer; i++) {
+                for (var i = 0; i < config.num_timer; i++) {
                     var template = createSimpleTimerTemplate("timerContainer", i);
                     document.getElementById("timer_title" + i).innerHTML = futureDateList[i].name;
                     document.getElementById("timer_date" + i).innerHTML = futureDateList[i].date;
@@ -93,7 +89,7 @@
                 }
 
                 var interval = setInterval(function () {
-                    setTimerValues(futureDateList, numTimer);
+                    setTimerValues(futureDateList, config.num_timer);
                 }, 1000);
                 timerIntervals.push(interval);
             });
@@ -158,7 +154,7 @@
                 title.id = 'timer_title' + index;
                 title.class = 'timer_title';
                 title.style.color = '#8678E9';
-                title.style.size = '2em';
+                
 //                var titleText = document.createTextNode(DueDate.name);
 //                title.appendChild(titleText);
 
@@ -184,7 +180,8 @@
             function setTimerValues(dbDateList, numTimer) {
 
                 for (var i = 0; i < numTimer; i++) {
-                    writeTimeDHMS(document.getElementById("timer_countdown" + i), getJSDate(dbDateList[i].date).getTime());
+                    writeTime(document.getElementById("timer_countdown" + i), getJSDate(dbDateList[i].date), "dhms");
+                    // same with dtStringToJSDate(dbDateList[i].date) why ?
                 }
             }
 
@@ -206,13 +203,16 @@
             }
 
             function getJSDate(dbDateTime) {
+                // ******* dbDateTime type should be time stamp
                 return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
             }
-
-
-            function writeTimeDHMS(element, dateMs) {
-                var date = new DateDHMS(dateMs);
+        
+            function writeTime(element, jsDate, mode) {
+              
+                if(mode === "dhms"){
+                var date = new DateDHMS(jsDate);
                 element.innerHTML = date.day + " days " + date.hour + "h " + date.minute + "m " + date.second + "s";
+               }
             }
 
 

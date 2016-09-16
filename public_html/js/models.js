@@ -63,9 +63,9 @@ function Configuration(init) {
 }
 
 
-function getModel(name){
-    switch(name){
-        case 'dates': 
+function getModel(name) {
+    switch (name) {
+        case 'dates':
             return new DueDate();
             break;
         case 'category':
@@ -73,33 +73,57 @@ function getModel(name){
             break;
         case 'sharepoint':
             return new SpPath();
-            
+
     }
 }
 
-function DateDHMS(dateMs){
-                 
-                
-                console.log(dateMs);
-                var dateNow = Date.now();
-                console.log(dateNow);
-                var remainMs = dateMs-Date.now();
-                console.log(remainMs);
-                
-                var ms = 1;
-                var s = ms*1000;
-                var m = s*60;
-                var h = m*60;
-                var d = h*24;
-                             
-                               
-           
-                
-                this.day = Math.floor(remainMs/d);
-                this.hour = Math.floor((remainMs%d)/h);
-                this.minute = Math.floor(((remainMs%d)%h)/m);
-                this.second = Math.floor((((remainMs%d)%h)%m)/s);
-                
-                     console.log(this.day, this.hour, this.minute, this.second);
+function DateDHMS(jsDate) {
+    var dateMs = jsDate.getTime();
+
+
+    var dateNow = Date.now();
+    console.log(dateNow);
+    var remainMs = dateMs - Date.now();
+    console.log(remainMs);
+
+    var ms = 1;
+    var s = ms * 1000;
+    var m = s * 60;
+    var h = m * 60;
+    var d = h * 24;
+
+
+
+
+    this.day = Math.floor(remainMs / d);
+    this.hour = Math.floor((remainMs % d) / h);
+    this.minute = Math.floor(((remainMs % d) % h) / m);
+    this.second = Math.floor((((remainMs % d) % h) % m) / s);
+
+    console.log(this.day, this.hour, this.minute, this.second);
+
+
+}
+
+function DateYMDHMS(jsDate) {
+
+
+    var dateMs = jsDate.getTime();
+
+    var dateNow = Date.now();
+    console.log(dateNow);
+    var remainMs = dateMs - Date.now();
+    console.log(remainMs);
+
+    var ms = 1;
+    var s = ms * 1000;
+    var m = s * 60;
+    var h = m * 60;
+    var d = h * 24;
+
+    this.day = Math.floor(remainMs / d);
+    this.hour = Math.floor((remainMs % d) / h);
+    this.minute = Math.floor(((remainMs % d) % h) / m);
+    this.second = Math.floor((((remainMs % d) % h) % m) / s);
 }
 

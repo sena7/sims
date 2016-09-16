@@ -154,7 +154,7 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
     return jsonObj;
 }
 
-function setTableWithData(tableId, list) {
+function setTableWithArray(tableId, list) {
 
     console.log("fuction setTableWithData(", tableId,",", Object.keys(list[0]), ")");
     
@@ -198,9 +198,10 @@ function setTableWithData(tableId, list) {
                     var date = getJSDate(value);
                     var adjustedMonth = date.getUTCMonth() + 1;
 
-                    value = date.getUTCDate() + "/" + adjustedMonth + "/" + date.getUTCFullYear();
+                    value = date.getUTCDate().toString() + "/" + (adjustedMonth<10?"0":"") + adjustedMonth.toString() + "/" + date.getUTCFullYear();
                     input.className += " datepicker"; // be aware of the space before the appending class name
                     // input.setAttribute("data-date-format", "dd/mm/yyyy");
+                    input.addEventListener('change', function(){alert(input.value);});
                 }
                 input.setAttribute("value", value);
 
@@ -225,6 +226,26 @@ function setTableWithData(tableId, list) {
     }
     table.appendChild(tbody);
 }
+function setTableWithObject(tableId, object){
+    var table = document.getElementById(tableId);
+    var labels = Object.keys(object);
+    console.log(labels);
+    for(var i = 0; i<labels.length; i++){
+        var row = table.insertRow();
+        var label = row.insertCell(0);
+        var cell = row.insertCell(1);
+        cell.style.padding = '5px 15px 0px 15px';
+        var underScoreRemoved = labels[i].replace(/_/gi, " ");
+        var number = underScoreRemoved.replace(/num/gi, "number");
+        var seconds = number.replace(/sec/gi, "seconds");
+        label.innerHTML = seconds;
+        var input = document.createElement('INPUT');
+        input.name = labels[i];
+        input.value = eval('object.' + labels[i]);
+        cell.appendChild(input);
+    }
+}
+
 function getJSDate(dbDateTime) {
     return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
 }

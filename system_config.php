@@ -34,6 +34,14 @@ class image {
 
 }
 
+class config {
+
+    public $num_timer;
+    public $slide_show_sec;
+    public $timer_show_sec;
+
+}
+
 require('config.php');
 $selectDateSql = "select id, category_id, name, date, visible from date order by date asc ";
 $selectDateSqlStmt = $pdo->prepare($selectDateSql);
@@ -45,6 +53,11 @@ $selectCatSql = "select id, name, colour from date_category";
 $selectCatSqlStmt = $pdo->prepare($selectCatSql);
 $selectCatSqlStmt->execute();
 $selectCatResult = $selectCatSqlStmt->fetchAll(PDO::FETCH_CLASS, "dateCategory");
+
+$selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec from system_config where id=(select max(id) from system_config) LIMIT 1";
+$selectSysConfigSqlStmt = $pdo->prepare($selectSysConfigSql);
+$selectSysConfigSqlStmt->execute();
+$config = $selectSysConfigSqlStmt->fetchAll(PDO::FETCH_CLASS, "config");
 
 
 //$image_id = 2;
@@ -112,7 +125,8 @@ foreach ($result as $row) {
             var dates;
             var dateCategories;
             var images;
-            
+            var misc;
+
             $(document).ready(function () {
                 // check if the current user's browser supports File APIs
                 if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -126,9 +140,12 @@ foreach ($result as $row) {
                 console.log(Object.keys(dates[0])[0]);
                 images = <?php echo json_encode($result); ?>;
                 console.log(images);
-                setTableWithData("tb_dates", dates);
-                setTableWithData("tb_category", dateCategories);
-                setTableWithData("tb_images", images);
+                misc = <?php echo json_encode($config); ?>;
+                 console.log(misc);
+                setTableWithArray("tb_dates", dates);
+                setTableWithArray("tb_category", dateCategories);
+                setTableWithArray("tb_images", images);
+                setTableWithObject("tb_misc", misc[0]);
 
                 $(".datepicker").datepicker(
                         {
@@ -260,7 +277,15 @@ foreach ($result as $row) {
 
                         </div>
 
+                        <h3>Misc</h3>
+                        <div>
+                            <!--                    <fieldset>
+                                                    <legend>Category</legend>-->
+                            <table id = "tb_misc">
+                            </table>
+                            <!--</fieldset>-->
 
+                        </div>
 
                     <!--<input id="configFormSubmit" type="button" value="save">-->
                         <!--</form>-->

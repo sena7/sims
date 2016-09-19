@@ -76,14 +76,28 @@ foreach ($result as $row) {
 }
 
 
-//while($row = $query->fetch(PDO::FETCH_ASSOC)){
-//  $name = $row['name'];
-//  $image = $row['file'];
-//  echo '<p>'.$name.'</p><img src="data:image/jpeg;base64,'.base64_encode($image).'" alt="Image" height="150px"/>';
-//}
-//var_dump($result->name);
-//header("Content-Type: image");
-//echo '<p>'.$name.'</p><img src="data:image/jpeg;base64,'.base64_encode($image).'" alt="Image" height="150px"/>';
+//post
+if($_POST['action'] == 'removeRow'){
+    print_r("?");
+    $sql = "";
+    if($_POST['record'] == 'date'){
+        $sql = "delete from date where id=:id";
+    }else if($_POST['record'] == 'date_category'){
+        $sql = "delete from date_category where id=:id";
+    }else if($_POST['record'] == 'image'){
+        $sql = "delete from image where id=:id";
+    }else{
+        
+    }
+    
+       $query = $pdo->prepare($sql);
+       // $query->bindParam(':record', $_POST['record'], PDO::PARAM_STR);
+        $query->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
+        $query->execute();
+        
+      
+}
+
 ?>
 <html>
     <head>
@@ -196,26 +210,38 @@ foreach ($result as $row) {
 
             });
 
-            function deleteRow(tableId, rowId) {
-                var table = document.getElementById(tableId);
-                table.deleteRow(0);
+            function confirmRemove(){
+                
             }
 
-            function removeRow(tableId, index) {
-                var table = document.getElementById(tableId);
-                console.log("triggered ? ");
-                table.deleteRow(index);
-                var removed = fileArray.pop(index);
-                console.log(removed);
-                //then rearrange.
-
+            function removeRow(rowElement, tableDataDbrecord) {
+                 console.log(rowElement.dataset.id);
+                 rowElement.parentElement.removeChild(rowElement);
+                
+                $.ajax({
+                    type:"POST", 
+                    url: '\system_config.php',
+                    data: {action: 'removeRow',
+                           record: tableDataDbrecord, 
+                           id: rowElement.dataset.id},
+                    success: function(data){
+                        alert(data);
+                    }
+                });
+            }
+            
+            function removeRowList(){
+                
             }
 
-            function GoToHomePage()
+            function redirectToHome()
             {
                 window.location = 'index.php';
             }
-
+            
+            function saveImages(){
+                
+            }
 
 
         </script>
@@ -288,7 +314,7 @@ foreach ($result as $row) {
     </head>
     <body>
         <div id="container">
-            <div><img src="public_html/img/content/left_arrow.png" width="50" onclick="GoToHomePage();" /></div>
+            <div><img src="public_html/img/content/left_arrow.png" width="50" onclick="redirectToHome();" /></div>
             <h2>Configuration</h2>
             <div id="configContents" class="accordion">
                 <!---->
@@ -301,7 +327,7 @@ foreach ($result as $row) {
                                                     
                                                     <legend>Dates</legend>-->
                             <form>
-                                <table id="tb_dates">
+                                <table id="tb_dates" data-dbrecord="date">
                                 </table>
                             </form>                       
                             <!--</fieldset>-->
@@ -310,7 +336,7 @@ foreach ($result as $row) {
                         <div>
                             <!--                    <fieldset>
                                                     <legend>Category</legend>-->
-                            <table id = "tb_category">
+                            <table id = "tb_category" data-dbrecord="date_category">
                             </table>
                             <!--</fieldset>-->
 
@@ -320,7 +346,7 @@ foreach ($result as $row) {
                         <div>
                             <!--                    <fieldset>
                                                     <legend>Category</legend>-->
-                            <table id = "tb_misc">
+                            <table id = "tb_misc" data-dbrecord="system_config">
                             </table>
                             <!--</fieldset>-->
 
@@ -335,28 +361,25 @@ foreach ($result as $row) {
 
                             <div>
                                 <fieldset>
-                                    <legend>Upload</legend>
+                                    <legend>Upload Images</legend>
                                     <div style="position: relative;">
-                                        <input type="file" id="input_files" name="user_files[]" multiple="multiple" style="padding: 20px;float:left;"/><input id="f2_submit" type="submit" value="upload" name="submit" style="display: none;float:left;"/>
+                                        <!--<form action="system_config.php" method="post">-->
+                                        <input type="file" id="input_files" name="user_files[]" multiple="multiple" style="padding: 20px;float:left;"/>
+                                        <input id="upload" type="submit" value="upload" name="uploadImagesSubmit" onclick = "" style="display: none;float:left;"/>
+                                        <!--</form>-->
                                     </div>
                                     <table id="tb_selectedFiles" ></table>
 
                                 </fieldset>
                             </div>
                             <fieldset>
-                                <legend>Saved images</legend>
+                                <legend>Saved Images</legend>
                                 <div>
-                                <table id="tb_images">
+                                <table id="tb_images" data-dbrecord="image">
                                 </table>
                                 </div>
                             </fieldset>
                         </div>
-
-
-                        <h3>Test</h3>
-                        <div><input class=flatpickr data-enable-time=true data-enable-seconds=true ></div>
-                        </div>
-
 
                         </div>
                         </body>

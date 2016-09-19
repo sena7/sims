@@ -156,9 +156,11 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
 
 function setTableWithArray(tableId, list) {
 
-    console.log("fuction setTableWithData(", tableId, ",", Object.keys(list[0]), ")");
+    console.log("fuction setTableWithData(", tableId, ",", Object.keys(list[0]), ")"+" | "+ list.length);
 
     var table = document.getElementById(tableId);
+    var tableDataDbrecord = table.dataset.dbrecord;
+    console.log(tableDataDbrecord);
     var tbody = document.createElement("TBODY");
     var labels = Object.keys(list[0]);
 
@@ -185,17 +187,22 @@ function setTableWithArray(tableId, list) {
     table.appendChild(thead);
     for (var i = 0; i < list.length; i++) {
         var obj = list[i];
-        var row = tbody.insertRow();
+        var row = tbody.insertRow(i);
+        var rowId = tableId+"_row_"+i;
+        console.log(rowId);
+        row.id = rowId;
+        console.log(list[i].id);
+        row.dataset.id = list[i].id;
         //row.id = "date" + i;
         for (var j = 0; j < labels.length; j++) {
-            var td = row.insertCell();
+            var td = row.insertCell(j);
             var label = Object.keys(obj)[j];
             var child = "";
 
             if (label === "file") {// file , currently just img. DOM img 
                 var img = document.createElement('IMG');
                 img.src = "data:image/jpeg;base64," + images[i].file;
-                img.height = "120";
+                img.height = "100";
                 img.class = "slide_image";
                 child = img;
             } else { // any other data type other than file. DOM input
@@ -242,7 +249,7 @@ function setTableWithArray(tableId, list) {
         deleteImg.src = "public_html/img/content/delete.png";
         deleteImg.width = "20";
         deleteImg.style.cursor ="pointer";
-        deleteImg.addEventListener('click', function(){alert('Delete, to be developed');}, false);
+        deleteImg.addEventListener('click', function(){removeRow(this.parentElement.parentElement, tableDataDbrecord);});
         singleDeleteBtnCell.appendChild(deleteImg);
 
         var multiDeleteBtnCell = row.insertCell();

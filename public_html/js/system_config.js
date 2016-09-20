@@ -15,9 +15,9 @@ $(document).ready(function () {
     }, false);
     console.log("fileInput.files.length: " + fileInput.files.length);
 
-    var inputFileSubmitId = "f2_submit";
+
     fileInput.addEventListener('change', function () {
-        handleSaveButton(inputFileId, inputFileSubmitId);
+        handleSaveImageButton(fileInput.files.length);
     }, false);
 
     //local storage
@@ -156,9 +156,11 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
 
 function setTableWithArray(tableId, list) {
 
-    console.log("fuction setTableWithData(", tableId, ",", Object.keys(list[0]), ")"+" | "+ list.length);
+    //console.log("fuction setTableWithData(", tableId, ",", Object.keys(list[0]), ")" + " | " + list.length);
 
     var table = document.getElementById(tableId);
+    var updateSubmitId = eval('update' + table.dataset.dbrecord).id;
+    console.log(updateSubmitId);
     var tableDataDbrecord = table.dataset.dbrecord;
     console.log(tableDataDbrecord);
     var tbody = document.createElement("TBODY");
@@ -172,11 +174,11 @@ function setTableWithArray(tableId, list) {
         var label = "";
         if (i < labels.length) {
 
-             label = labels[i];
-        } else{
-             label = "delete";
+            label = labels[i];
+        } else {
+            label = "delete";
         }
-         
+
         td.innerHTML = label;
         tr.appendChild(td);
 
@@ -188,7 +190,7 @@ function setTableWithArray(tableId, list) {
     for (var i = 0; i < list.length; i++) {
         var obj = list[i];
         var row = tbody.insertRow(i);
-        var rowId = tableId+"_row_"+i;
+        var rowId = tableId + "_row_" + i;
         console.log(rowId);
         row.id = rowId;
         console.log(list[i].id);
@@ -207,6 +209,7 @@ function setTableWithArray(tableId, list) {
                 child = img;
             } else { // any other data type other than file. DOM input
                 var input = document.createElement("INPUT");
+                input.id = tableId + 'input' + i;
                 input.style.fontFamily = "inherit";
                 //'Tw Cen MT', Monospace, 'Sans-serif'
                 input.name = Object.keys(obj)[j];
@@ -237,7 +240,14 @@ function setTableWithArray(tableId, list) {
                     input.setAttribute("type", "text");
                 }
 
+                input.addEventListener('focus', function () {
+                    handleUpdateButton(input.id, "", updateSubmitId, 'focus');
+                });
+                input.addEventListener('blur', function () {
+                    handleUpdateButton(input.id, 'Date B', updateSubmitId, 'blur');
+                });
                 child = input;
+
             }
             td.appendChild(child);
         }
@@ -248,8 +258,10 @@ function setTableWithArray(tableId, list) {
         deleteImg.class = "deleteButton";
         deleteImg.src = "public_html/img/content/delete.png";
         deleteImg.width = "20";
-        deleteImg.style.cursor ="pointer";
-        deleteImg.addEventListener('click', function(){removeRow(this.parentElement.parentElement, tableDataDbrecord);});
+        deleteImg.style.cursor = "pointer";
+        deleteImg.addEventListener('click', function () {
+            deleteRecord(this.parentElement.parentElement, tableDataDbrecord);
+        });
         singleDeleteBtnCell.appendChild(deleteImg);
 
         var multiDeleteBtnCell = row.insertCell();
@@ -260,7 +272,9 @@ function setTableWithArray(tableId, list) {
         multiDeleteBtnCell.appendChild(checkbox);
     }
     table.appendChild(tbody);
+
 }
+
 function setTableWithObject(tableId, object) {
     var table = document.getElementById(tableId);
     var labels = Object.keys(object);
@@ -284,12 +298,8 @@ function setTableWithObject(tableId, object) {
 function getJSDate(dbDateTime) {
     return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
 }
-function save() {
-    var data = $("#configForm").serializeArray();
-    console.log(data);
-}
 
-function previewFile() {
+function previewFiles() {
 
     var files = document.querySelector('input[type=file]').files;
     var imgs = document.getElementsByTagName('img');
@@ -316,60 +326,48 @@ function previewFile() {
 function handleFileSelect(inputFileId) {
     onchangeCount += 1;
 
-    var newFileArray = [];
+    //var newFileArray = [];
     var files = document.getElementById(inputFileId).files;// they are the users choice of each time
 
+    //var fileArrayLength = fileArray.length;
+    //console.log(fileArrayLength);
 
+    //if (fileArrayLength === 0) {
+    //   for (var i = 0, f; f = files[i]; i++) {
 
-//var files = evt.target.files; // FileList object
-    //var files = document.getElementsByTagName('input').files;
+    //       newFileArray.push(f);
+    //   }
+    // } else {
+//        for (var i = 0, f; f = files[i]; i++) {
+//            var exists = false;
+//            var name = f.name;
+//            var size = f.size;
+//            var type = f.type;
+//            for (var j = 0, e; e = fileArray[j]; j++) {
+//                if (name === e.name && size === e.size && type === e.type) {
+//                    exists = true;
+//                }
+//            }
+//
+//            if (exists === false) {
+//                newFileArray.push(f);
+//            }
+//
+//
+//
+//        }
+//    }
 
-    //var files = document.getElementById(fileInputId).files;
-    // files is a FileList of File objects. List some properties.
-    //var fileArray = getFileArray(fileInputId);
-    //var fileArray = [];
-
-
-
-
-
-    var fileArrayLength = fileArray.length;
-    console.log(fileArrayLength);
-
-    if (fileArrayLength === 0) {
-        for (var i = 0, f; f = files[i]; i++) {
-
-            newFileArray.push(f);
-        }
-    } else {
-        for (var i = 0, f; f = files[i]; i++) {
-            var exists = false;
-            var name = f.name;
-            var size = f.size;
-            var type = f.type;
-            for (var j = 0, e; e = fileArray[j]; j++) {
-                if (name === e.name && size === e.size && type === e.type) {
-                    exists = true;
-                }
-            }
-
-            if (exists === false) {
-                newFileArray.push(f);
-            }
-
-
-
-        }
-    }
-
-    console.log(newFileArray.length);
+    // console.log(newFileArray.length);
 
     var table = document.getElementById('tb_selectedFiles');
-    for (var i = 0, f; f = newFileArray[i]; i++) {
+    for (var i = 0, f; f = files[i]; i++) {
+        //for (var i = 0, f; f = newFileArray[i]; i++) {
 
 
         console.log(f);
-        var row = table.insertRow(fileArray.length + i);
+        //var row = table.insertRow(fileArray.length);
+        var row = table.insertRow();
         var rowId = "row" + i;
         var rowClass = "delete";
         row.id = rowId;
@@ -395,8 +393,8 @@ function handleFileSelect(inputFileId) {
             imgSize = f.size();
             sizeUnit = "Bytes";
         }
-
-        var sequence = document.createTextNode(fileArray.length + i + 1);
+        var sequence = document.createTextNode(i);
+        //var sequence = document.createTextNode(fileArray.length + i + 1);
         sequenceCell.appendChild(sequence);
         var name = document.createTextNode(escape(f.name));
         var size = document.createTextNode(imgSize + sizeUnit);
@@ -414,11 +412,18 @@ function handleFileSelect(inputFileId) {
         //button.onclick = function(){removeRow("tb_selectedFiles", i);};
         //removeFileRow("tb_selectedFiles", fileArray.length+i);
         removeCell.appendChild(button);
+
+        //fileArray.push(f);
     }
 
-    for (var i = 0, e; e = newFileArray[i]; i++) {
-        fileArray.push(e);
-    }
+
+    //   console.log(fileArray);
+
+    var saveImageBtn = document.getElementById("saveImage");
+    saveImageBtn.addEventListener('click', function () {
+        //saveImages(fileArray, "image");
+        saveImages("imageUploadForm");
+    });
 
 }
 
@@ -441,14 +446,14 @@ function removeRow(tableId, index) {
     console.log(removed);
     //then rearrange.
 }
-function handleSaveButton(fileInputId, submitId) {
+function handleSaveImageButton(fileArrayLength) {
 //    var fileListLength = document.getElementById(fileInputId).files.length;
-    if (fileArray.length > 0) {
-        document.getElementById(submitId).style.display = 'block';
+    if (fileArrayLength > 0) {
+        document.getElementById("saveImage").style.display = 'block';
     } else {
-        document.getElementById(submitId).style.display = 'none';
+        document.getElementById("saveImage").style.display = 'none';
     }
-    console.log(document.getElementById(submitId).style.display);
+    console.log(document.getElementById("saveImage").style.display);
 }
 
 function getFileArray(inputId) {
@@ -469,5 +474,55 @@ function getFileArray(inputId) {
 }
 //Array.prototype.contains
 
-function getGlobalVarFileArray() {
+function deleteRecord(rowElement, tableDataDbrecord) {
+    console.log(rowElement.dataset.id);
+    rowElement.parentElement.removeChild(rowElement);
+
+    $.ajax({
+        type: "POST",
+        url: '\system_config.php',
+        data: {action: 'deleteRecord',
+            record: tableDataDbrecord,
+            id: rowElement.dataset.id},
+        success: function () {
+
+        }
+    });
+}
+
+
+function saveImages(formId) {
+
+    var formData = new FormData(document.getElementById(formId));
+
+    $.ajax({
+        url: 'system_config.php',
+        type: 'POST',
+        xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            return myXhr;
+        },
+        success: function (data) {
+            console.log("Data Uploaded: " + data);
+        },
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false
+    });
+    return false;
+}
+
+function handleUpdateButton(inputId, inputValueOld, updateSubmitId, eventName) {
+    //document.forms.namedItem(formName).elements.namedItem("updateImage").style.display = "block";
+    if (eventName === 'focus') {
+        document.getElementById(updateSubmitId).style.display = "block";
+    } else if (eventName === 'blur') {
+        console.log(document.getElementById(inputId).value + " " + inputValueOld);
+        if (document.getElementById(inputId).value === inputValueOld) {
+            document.getElementById(updateSubmitId).style.display = "none";
+        } else {
+            document.getElementById(updateSubmitId).style.display = "block";
+        }
+    }
 }

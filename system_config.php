@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
+
 <?php
 
 class date {
@@ -75,29 +71,58 @@ foreach ($result as $row) {
     $row->file = base64_encode($row->file);
 }
 
-
+if (isset($_POST['action'])) {
 //post
-if($_POST['action'] == 'removeRow'){
-    print_r("?");
-    $sql = "";
-    if($_POST['record'] == 'date'){
-        $sql = "delete from date where id=:id";
-    }else if($_POST['record'] == 'date_category'){
-        $sql = "delete from date_category where id=:id";
-    }else if($_POST['record'] == 'image'){
-        $sql = "delete from image where id=:id";
-    }else{
-        
-    }
-    
-       $query = $pdo->prepare($sql);
-       // $query->bindParam(':record', $_POST['record'], PDO::PARAM_STR);
+// delete 1 row
+    if ($_POST['action'] == 'deleteRecord') {
+
+        $sql = "";
+        if ($_POST['record'] == 'date') {
+            $sql = "delete from date where id=:id";
+        } else if ($_POST['record'] == 'date_category') {
+            $sql = "delete from date_category where id=:id";
+        } else if ($_POST['record'] == 'image') {
+            $sql = "delete from image where id=:id";
+        } else {
+            
+        }
+
+        $query = $pdo->prepare($sql);
+        // $query->bindParam(':record', $_POST['record'], PDO::PARAM_STR);
         $query->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
         $query->execute();
-        
-      
+    }
+
+    if ($_POST['action'] == 'saveImage') {
+
+        $sql = "insert into image (id, order_num, name, file, visible) values ( null, null, 'test', :file, 1)";
+        // (select max(order_num) from image) + :order_num
+        $data = $_POST['data'];
+        echo '<script>console.log("hi");</script>';
+        foreach ($data as $d) {
+            $query->bindParam(':file', $d, PDO::PARAM_LOB);
+            $query = $pdo->prepare($sql);
+            $query->execute();
+        }
+    }
 }
 
+if (isset($_FILES['user_files'])) {
+    $files = $_FILES['user_files'];
+    //echo print_r($files);
+    $sql = "insert into image (id, order_num, name, file, visible) values ( null, 4, 'test', :file, 1)";
+    if (isset($_FILES['user_files']['tmp_name'])) {
+        echo var_dump(count($_FILES['user_files']));
+
+        for ($i = 0; $i < count($_FILES['user_files']); $i ++) {
+            $fp = fopen($_FILES['user_files']['tmp_name'][$i], 'rb');
+
+            $query = $pdo->prepare($sql);
+            $query->bindParam(':file', $fp, PDO::PARAM_LOB);
+            $query->execute();
+        }
+    }
+}
 ?>
 <html>
     <head>
@@ -208,40 +233,27 @@ if($_POST['action'] == 'removeRow'){
                     ]
                 });
 
+
             });
 
-            function confirmRemove(){
-                
+            function confirmRemove() {
+
             }
 
-            function removeRow(rowElement, tableDataDbrecord) {
-                 console.log(rowElement.dataset.id);
-                 rowElement.parentElement.removeChild(rowElement);
-                
-                $.ajax({
-                    type:"POST", 
-                    url: '\system_config.php',
-                    data: {action: 'removeRow',
-                           record: tableDataDbrecord, 
-                           id: rowElement.dataset.id},
-                    success: function(data){
-                        alert(data);
-                    }
-                });
+            function removeRowList() {
+
             }
-            
-            function removeRowList(){
-                
+
+            function insertRow() {
+
             }
 
             function redirectToHome()
             {
                 window.location = 'index.php';
             }
-            
-            function saveImages(){
-                
-            }
+
+
 
 
         </script>
@@ -251,7 +263,7 @@ if($_POST['action'] == 'removeRow'){
                 font-family: "Tw Cen MT", Monospace, 'Sans-serif';
             }
             input[type="button"], input[type="submit"], button{
-                background-color: #dbe7d5; /* Green */
+                background-color: #006699; /* Green */
                 border: none;
                 color: white;
                 padding: 10px 15px;
@@ -310,11 +322,14 @@ if($_POST['action'] == 'removeRow'){
             .dataTables_wrapper{
                 text-align:left;
             }
+            div .updateBtn{
+                padding: 10px; 
+            }
         </style>
     </head>
     <body>
         <div id="container">
-            <div><img src="public_html/img/content/left_arrow.png" width="50" onclick="redirectToHome();" /></div>
+            <div><img src="public_html/img/content/left_arrow.png" width="50" onclick="redirectToHome();" style="cursor:pointer;"/></div>
             <h2>Configuration</h2>
             <div id="configContents" class="accordion">
                 <!---->
@@ -326,35 +341,37 @@ if($_POST['action'] == 'removeRow'){
                                                     
                                                     
                                                     <legend>Dates</legend>-->
-                            <form>
-                                <table id="tb_dates" data-dbrecord="date">
+                            <form id="dateForm">
+                                <div><table id="tb_dates" data-dbrecord="date">
                                 </table>
+                                </div>
+                                <div class="updateBtn">
+                                    <input id="updatedate" type="submit" value="Update" data-submit-type="update" name="dateUpdateSubmit" style="display: none;float:left;"/>
+                                </div>
                             </form>                       
-                            <!--</fieldset>-->
+
                         </div>
                         <h3>Category</h3>
                         <div>
-                            <!--                    <fieldset>
-                                                    <legend>Category</legend>-->
-                            <table id = "tb_category" data-dbrecord="date_category">
-                            </table>
-                            <!--</fieldset>-->
+                            <form id="categoryForm">
+                                <div>
+                                <table id = "tb_category" data-dbrecord="date_category">
+                                </table>
+                                </div>
+                                <div class="updateBtn">
+                                    <input id="updatedate_category" type="submit" value="Update" data-submit-type="update" name="categoryUpdateSubmit" style="display: none;float:left;"/>
+                                </div>
+                            </form>    
+
 
                         </div>
 
                         <h3>Misc</h3>
                         <div>
-                            <!--                    <fieldset>
-                                                    <legend>Category</legend>-->
                             <table id = "tb_misc" data-dbrecord="system_config">
                             </table>
-                            <!--</fieldset>-->
 
                         </div>
-
-                    <!--<input id="configFormSubmit" type="button" value="save">-->
-                        <!--</form>-->
-                        <!--<form action="system_config.php" name="f2"  method="post" enctype="multipart/form-data">-->
 
                         <h3>Images</h3>
                         <div>
@@ -362,21 +379,33 @@ if($_POST['action'] == 'removeRow'){
                             <div>
                                 <fieldset>
                                     <legend>Upload Images</legend>
-                                    <div style="position: relative;">
-                                        <!--<form action="system_config.php" method="post">-->
-                                        <input type="file" id="input_files" name="user_files[]" multiple="multiple" style="padding: 20px;float:left;"/>
-                                        <input id="upload" type="submit" value="upload" name="uploadImagesSubmit" onclick = "" style="display: none;float:left;"/>
-                                        <!--</form>-->
+                                    <div>
+                                        <form id="imageUploadForm" action="saveImage" method="post" enctype="multipart/form-data">
+                                            <input type="file" id="input_files" name="user_files[]" multiple="multiple" style="padding: 20px;float:left;"/>
+
+                                        </form>
                                     </div>
-                                    <table id="tb_selectedFiles" ></table>
+                                    <div><input id="saveImage" type="submit" value="upload" name="imageUploadSubmit" onclick = "" style="display: none;float:left;"/></div>
+                                    <div>
+
+                                        <table id="tb_selectedFiles" ></table>
+
+                                    </div>
+
 
                                 </fieldset>
                             </div>
                             <fieldset>
                                 <legend>Saved Images</legend>
                                 <div>
-                                <table id="tb_images" data-dbrecord="image">
-                                </table>
+                                    <form id="imageForm" action="updateImage" method="post" enctype="text/plain">
+                                        <div><table id="tb_images" data-dbrecord="image">
+                                        </table>
+                                        </div>
+                                        <div class="updateBtn"><input id="updateimage" type="submit" value="Update" data-submit-type="update" name="imageUpdateSubmit" style="display: none;float:left;"/>
+                                        </div>
+                                    </form>    
+
                                 </div>
                             </fieldset>
                         </div>

@@ -431,12 +431,7 @@
 
     <body>
 
- <?php
- require('config.php');
- $sql = "select name from date";
-     $result = mysql_query($sql);
-     echo(mysql_result($result, 0));
- ?>
+ 
 
 
         <div  id = "container" class="container" style="padding:0px;border: 0px; color:#5AB0DB;width:100%;height:100%;max-height: 1020px;font-family:'Arial Black', Gadget, sans-serif; margin: 0 auto;">

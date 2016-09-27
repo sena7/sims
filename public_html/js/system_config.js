@@ -13,8 +13,6 @@ $(document).ready(function () {
     fileInput.addEventListener('change', function () {
         handleFileSelect(inputFileId);
     }, false);
-    console.log("fileInput.files.length: " + fileInput.files.length);
-
 
     fileInput.addEventListener('change', function () {
         handleSaveImageButton(fileInput.files.length);
@@ -124,14 +122,14 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
 
     // table rows array. index 0 = header, index = 1  
     var rows = document.getElementById(tableId).getElementsByTagName('tr');
-    console.log(rows);
+
     var keys = [];
     var headers = rows[0].getElementsByTagName('th');
-    console.log(headers);
+
     for (i = 0; i < headers.length; i++) {
         keys.push(headers[i].textContent);
     }
-    console.log(keys);
+
 
     var jsonObj = {};
     var jsonValue = [];
@@ -149,8 +147,7 @@ function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
     }
 
     jsonObj = JSON.parse("{" + "\"" + jsonKey + "\"" + ":" + "[" + jsonValue + "]}");
-    console.log(jsonObj);
-    console.log(JSON.stringify(jsonObj));
+
     return jsonObj;
 }
 
@@ -160,9 +157,9 @@ function setTableWithArray(tableId, list) {
 
     var table = document.getElementById(tableId);
     var updateSubmitId = eval('update' + table.dataset.dbrecord).id;
-    console.log(updateSubmitId);
+
     var tableDataDbrecord = table.dataset.dbrecord;
-    console.log(tableDataDbrecord);
+
     var tbody = document.createElement("TBODY");
     var labels = Object.keys(list[0]);
 
@@ -191,9 +188,9 @@ function setTableWithArray(tableId, list) {
         var obj = list[i];
         var row = tbody.insertRow(i);
         var rowId = tableId + "_row_" + i;
-        console.log(rowId);
+
         row.id = rowId;
-        console.log(list[i].id);
+
         row.dataset.id = list[i].id;
         //row.id = "date" + i;
         for (var j = 0; j < labels.length; j++) {
@@ -209,7 +206,8 @@ function setTableWithArray(tableId, list) {
                 child = img;
             } else { // any other data type other than file. DOM input
                 var input = document.createElement("INPUT");
-                input.id = tableId + 'input' + i;
+                var id = tableId + '_input_' + i + j;
+                input.id = id;
                 input.style.fontFamily = "inherit";
                 //'Tw Cen MT', Monospace, 'Sans-serif'
                 input.name = Object.keys(obj)[j];
@@ -225,7 +223,8 @@ function setTableWithArray(tableId, list) {
                     input.dataset.enableSeconds = true;
                     input.dataset.weekNumbers = true;
                 }
-                input.setAttribute("value", value);
+                input.value = value;
+
 
                 if (label === "colour") { // if the key name is colour
                     input.className += " jscolor"; // set class to jscolor.js colour picker // be aware of the space before the appending class name
@@ -239,13 +238,17 @@ function setTableWithArray(tableId, list) {
                 } else {
                     input.setAttribute("type", "text");
                 }
+                input.dataset.initialValue = value;
 
                 input.addEventListener('focus', function () {
-                    handleUpdateButton(input.id, "", updateSubmitId, 'focus');
+
+                    handleUpdateButton(this.id, updateSubmitId, 'focus');
                 });
                 input.addEventListener('blur', function () {
-                    handleUpdateButton(input.id, 'Date B', updateSubmitId, 'blur');
+
+                    handleUpdateButton(this.id, updateSubmitId, 'blur');
                 });
+
                 child = input;
 
             }
@@ -285,15 +288,56 @@ function setTableWithObject(tableId, object) {
         var cell = row.insertCell(1);
         cell.style.padding = '5px 15px 0px 15px';
         var underScoreRemoved = labels[i].replace(/_/gi, " ");
-        var number = underScoreRemoved.replace(/num/gi, "number");
-        var seconds = number.replace(/sec/gi, "seconds");
-        label.innerHTML = seconds;
+        var a = underScoreRemoved.replace(/num/gi, "number");
+        var b = a.replace(/sec/gi, "seconds");
+        label.innerHTML = b.capitalisedString();
         var input = document.createElement('INPUT');
         input.name = labels[i];
         input.value = eval('object.' + labels[i]);
         cell.appendChild(input);
     }
+
 }
+String.prototype.isWhiteSpace = function () {
+    var isWhiteSpace = false;
+    var ASCIIwhiteSpaceList = [' ', '\t', '\r', '\n', '\x0b'];
+    for (var i = 0; i < ASCIIwhiteSpaceList.length; i++) {
+        if (this == ASCIIwhiteSpaceList[i]) {
+            isWhiteSpace = true;
+            break;
+        }
+
+    }
+
+
+    return isWhiteSpace;
+
+}
+String.prototype.capitalisedString = function () {
+    var string = this.trim();
+    var spaceIndexArr = [];
+    for (var i = 0; i < string.length; i++) {
+        if (string.charAt(i).isWhiteSpace()) {
+            spaceIndexArr.push(i);
+        }
+
+    }
+    console.log(spaceIndexArr);
+//    if(spaceIndexArr.length===0){
+    string = string.charAt(0).toUpperCase() + string.slice(1);
+//    }else{
+//        
+//        string = string.charAt(0).toUpperCase() + string.slice(1); 
+//        console.log(string);
+//        for(var i=0; i<spaceIndexArr.length;i++){
+//            console.log(string.charAt(spaceIndexArr[i]+1));
+//        }
+//        
+//    }
+    return string;
+};
+
+
 
 function getJSDate(dbDateTime) {
     return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
@@ -513,13 +557,15 @@ function saveImages(formId) {
     return false;
 }
 
-function handleUpdateButton(inputId, inputValueOld, updateSubmitId, eventName) {
-    //document.forms.namedItem(formName).elements.namedItem("updateImage").style.display = "block";
+function handleUpdateButton(inputId, updateSubmitId, eventName) {
+    console.log(inputId, eventName);
+    var e = document.getElementById(inputId);
+    
     if (eventName === 'focus') {
         document.getElementById(updateSubmitId).style.display = "block";
     } else if (eventName === 'blur') {
-        console.log(document.getElementById(inputId).value + " " + inputValueOld);
-        if (document.getElementById(inputId).value === inputValueOld) {
+        console.log(e.value, e.dataset.initialValue);
+        if (e.value === e.dataset.initialValue) {
             document.getElementById(updateSubmitId).style.display = "none";
         } else {
             document.getElementById(updateSubmitId).style.display = "block";

@@ -30,13 +30,15 @@ class image {
 
 }
 
-class config {
+ class config {
 
-    public $num_timer;
-    public $slide_show_sec;
-    public $timer_show_sec;
+        public $num_timer;
+        public $slide_show_sec;
+        public $timer_show_sec;
+        public $show_past_times;
+        public $time_type;
 
-}
+    }
 
 require('config.php');
 $selectDateSql = "select id, category_id, name, date, visible from date order by date asc ";
@@ -50,7 +52,7 @@ $selectCatSqlStmt = $pdo->prepare($selectCatSql);
 $selectCatSqlStmt->execute();
 $selectCatResult = $selectCatSqlStmt->fetchAll(PDO::FETCH_CLASS, "dateCategory");
 
-$selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec from system_config where id=(select max(id) from system_config) LIMIT 1";
+ $selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec, show_past_times, time_type from system_config where id=(select max(id) from system_config) LIMIT 1";
 $selectSysConfigSqlStmt = $pdo->prepare($selectSysConfigSql);
 $selectSysConfigSqlStmt->execute();
 $config = $selectSysConfigSqlStmt->fetchAll(PDO::FETCH_CLASS, "config");

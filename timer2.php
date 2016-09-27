@@ -16,14 +16,17 @@
         public $name;
         public $date;
         public $visible;
-        
-       
+
     }
 
     class config {
-    public $num_timer;
-    public $slide_show_sec;
-    public $timer_show_sec;
+
+        public $num_timer;
+        public $slide_show_sec;
+        public $timer_show_sec;
+        public $show_past_times;
+        public $time_type;
+
     }
 
     require('config.php');
@@ -34,9 +37,9 @@
     $selectDateSqlStmt->execute();
     $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
     // var_dump($result);
- 
+
     $now = new DateTime(); // utc I think 20160913
-   
+
     foreach ($selectDateResult as $date) {
         if (new DateTime($date->date) < $now) {
             array_push($pastDateList, $date);
@@ -44,9 +47,9 @@
             array_push($futureDateList, $date);
         }
     }
-   
+
     // table system_config
-    $selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec from system_config where id=(select max(id) from system_config) LIMIT 1";
+    $selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec, show_past_times, time_type from system_config where id=(select max(id) from system_config) LIMIT 1";
     $selectSysConfigSqlStmt = $pdo->prepare($selectSysConfigSql);
     $selectSysConfigSqlStmt->execute();
     $selectSysConfigResult = $selectSysConfigSqlStmt->fetchAll(PDO::FETCH_CLASS, "config");
@@ -62,7 +65,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="public_html/js/models.js"></script>
-      
+
         <script type ="text/javascript">
 
             var timerIntervals = [];
@@ -73,23 +76,24 @@
                 var pastDateList = <?php echo json_encode($pastDateList); ?>;
                 var futureDateList = <?php echo json_encode($futureDateList); ?>;
                 var config = <?php echo json_encode($config); ?>;
-               
-               
+
+
                 console.log(config);
                 console.log(config.num_timer);
-                
+                console.log(config.show_past_times);
+
 
                 for (var i = 0; i < config.num_timer; i++) {
                     var template = createSimpleTimerTemplate("timerContainer", i);
                     document.getElementById("timer_title" + i).innerHTML = futureDateList[i].name;
                     document.getElementById("timer_date" + i).innerHTML = futureDateList[i].date;
                     timerTemplateList.push(template);
-                    
+
 
                 }
 
                 var interval = setInterval(function () {
-                    setTimerValues(futureDateList, config.num_timer);
+                    setTimerValues(futureDateList, config.num_timer, config.time_type);
                 }, 1000);
                 timerIntervals.push(interval);
             });
@@ -154,7 +158,7 @@
                 title.id = 'timer_title' + index;
                 title.class = 'timer_title';
                 title.style.color = '#8678E9';
-                
+
 //                var titleText = document.createTextNode(DueDate.name);
 //                title.appendChild(titleText);
 
@@ -177,10 +181,10 @@
                 return template;
             }
 
-            function setTimerValues(dbDateList, numTimer) {
+            function setTimerValues(dbDateList, numTimer, timeType) {
 
                 for (var i = 0; i < numTimer; i++) {
-                    writeTime(document.getElementById("timer_countdown" + i), getJSDate(dbDateList[i].date), "dhms");
+                    writeTime(document.getElementById("timer_countdown" + i), getJSDate(dbDateList[i].date), timeType);
                     // same with dtStringToJSDate(dbDateList[i].date) why ?
                 }
             }
@@ -206,13 +210,69 @@
                 // ******* dbDateTime type should be time stamp
                 return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
             }
-        
+
             function writeTime(element, jsDate, mode) {
-              
-                if(mode === "dhms"){
-                var date = new DateDHMS(jsDate);
-                element.innerHTML = date.day + " days " + date.hour + "h " + date.minute + "m " + date.second + "s";
-               }
+                
+                var time = new TimeDHMS(jsDate);
+                if (mode === "dhms") {
+
+                    element.innerHTML = getStringValue(time.day, "day") + " " + time.hour + "h " + time.minute + "m " + time.second + "s";
+                }
+                if (mode === "ymdhms") {
+                    console.log(time.day%365);
+                    var MonthAndDay = new getMonthAndDay(new Date(), jsDate, time.day % 365);
+                    
+                    element.innerHTML = getStringValue(Math.floor(time.day/365), "year") + " "
+                                      + getStringValue(MonthAndDay.monthCount, "month") + " "
+                                      + getStringValue(MonthAndDay.daysLeft, "day") + " "
+                            + time.hour + "h " + time.minute + "m " + time.second + "s";
+                }
+
+                function getStringValue(value, unit) {
+                     if (value === 1) {
+                        return value.toString() + " " + unit;
+                    } else if(value > 1){
+                        return value.toString() + " " + unit + "s";
+                    } else {
+                        return "";
+                    } 
+                }
+
+
+
+                function getMonthAndDay(fromDate, toDate, daysLeft) {
+                    
+                    var daysInMonthArr = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    this.monthCount = 0;
+                    this.daysLeft = 0;
+                    
+                                      
+                    var futureMonthIndex = toDate.getUTCMonth();
+                    var currentMonthIndex = fromDate.getUTCMonth();
+
+                          var monthCnt = 0;
+                          var daysInMonthCnt = 0;
+                          for(var i = currentMonthIndex+1; i< 12; i++ ){
+                              monthCnt += 1;
+                              daysInMonthCnt += daysInMonthArr[i];
+                          }
+                          for(var i = 0; i<futureMonthIndex; i++){
+                              monthCnt += 1;
+                              daysInMonthCnt += daysInMonthArr[i];
+                          }
+                          
+                          var daysInCurrentMonth = daysInMonthArr[currentMonthIndex];
+                          var daysLeftTmp = daysLeft - daysInMonthCnt;
+                          
+                          if(daysLeftTmp > daysInCurrentMonth){
+                              monthCnt +=1;
+                              daysInMonthCnt +=daysInCurrentMonth;
+                          }
+                          
+                          this.monthCount = monthCnt;
+                          this.daysLeft = daysLeft - daysInMonthCnt;
+
+                }
             }
 
 
@@ -220,7 +280,7 @@
 
         <style type="text/css">
             div.container{
-                font-size: 5em;
+                font-size: 4em;
                 font-family:'Arial Black', Gadget, sans-serif; 
                 width: 100%;
                 position: relative;

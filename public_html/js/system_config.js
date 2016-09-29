@@ -214,12 +214,13 @@ function setTableWithArray(tableId, list) {
                 var value = eval('obj.' + labels[j]);
                 if (label === "date") {
                     var date = getJSDate(value);
-                    var adjustedMonth = date.getUTCMonth() + 1;
-
-                    value = date.getUTCDate().toString() + "/" + (adjustedMonth < 10 ? "0" : "") + adjustedMonth.toString() + "/" + date.getUTCFullYear();
-                    value += " " + (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours().toString() + ":" + (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes().toString() + ":" + (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
+                 
+//                    value = date.getUTCDate().toString() + "/" + (adjustedMonth < 10 ? "0" : "") + adjustedMonth.toString() + "/" + date.getUTCFullYear();
+//                    value += " " + (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours().toString() + ":" + (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes().toString() + ":" + (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
+                    value = date; // you don't need to do the above !
                     input.className += " flatpickr"; // be aware of the space before the appending class name
                     input.dataset.enableTime = true;
+                    input.dataset.time24hr = true;
                     input.dataset.enableSeconds = true;
                     input.dataset.weekNumbers = true;
                 }
@@ -571,4 +572,45 @@ function handleUpdateButton(inputId, updateSubmitId, eventName) {
             document.getElementById(updateSubmitId).style.display = "block";
         }
     }
+}
+
+function addRow(tableId, list){
+    
+    var table = document.getElementById(tableId);
+    var tbody = table.getElementsByTagName('tbody')[0];
+    var labels = Object.keys(list[0]);
+    var rowLength = table.rows.length;
+    var row = table.rows[rowLength-1].cloneNode(true);
+    
+    row.className = "even";
+    console.log(row, labels);
+    
+    console.log(row.cells.length);
+    
+    for(var i = 0; i<row.cells.length; i++){
+        var input = row.cells[i].childNodes[0];
+        input.id = tableId + "_input_"+tbody.rows.length.toString()+i;
+        if(input.className.trim()==="flatpickr flatpickr-input"){
+            input.className = "flatpickrNew";
+        }
+        if(input.className.trim()==="jscolor"){
+            input.style.backgroundColor =null;
+        }
+        input.value = null;
+        if(labels[i+1]==="date"){}
+        
+        input.style.border = input.type === "text"? "1px solid #5AB0DB":""; // border style
+        input.dataset.initialValue = null;
+        console.log(input);
+    }
+   
+    tbody.appendChild(row);
+   
+    // initialise flatpickrNew class
+    $('.flatpickrNew').flatpickr({
+        dateFormat: 'd/m/Y H:i:S'
+    });
+    
+    
+    
 }

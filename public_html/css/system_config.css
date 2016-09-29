@@ -39,6 +39,9 @@ input[type="text"]:focus{
     outline: none;
     border:1px solid #5AB0DB;
 }
+input[type="text"] .newInput{
+    border:1px solid #5AB0DB;
+}
 
 legend{
     padding: 0px 10px 0px 10px;

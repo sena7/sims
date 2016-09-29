@@ -265,14 +265,17 @@ if (isset($_FILES['user_files'])) {
                 font-family: "Tw Cen MT", Monospace, 'Sans-serif';
             }
             input[type="button"], input[type="submit"], button{
-                background-color: #006699; /* Green */
-                border: none;
-                color: white;
+                background-color: #ffffff;
+                border: 2px solid;
+                border-color: #bba5e7;
+                color: #666666;
                 padding: 10px 15px;
                 text-align: center;
                 text-decoration: none;
                 display: inline-block;
                 font-size: 16px;
+                font-weight: bold;
+                font-family: inherit;
                 border-radius: 5px;
                 -webkit-border-radius: 5px;
 
@@ -325,8 +328,15 @@ if (isset($_FILES['user_files'])) {
                 text-align:left;
             }
             div .updateBtn{
-                padding: 10px; 
+               
             }
+            div .buttons div{
+                float:left;
+                margin-top: 10px;
+                margin-right: 10px;
+                
+            }
+            
         </style>
     </head>
     <body>
@@ -345,11 +355,17 @@ if (isset($_FILES['user_files'])) {
                                                     <legend>Dates</legend>-->
                             <form id="dateForm">
                                 <div><table id="tb_dates" data-dbrecord="date">
+                                       
                                 </table>
                                 </div>
+                                <div class="buttons">
+                                <div><input type="button" value="Add New" onclick ="addRow('tb_dates', dates);" /></div>
                                 <div class="updateBtn">
-                                    <input id="updatedate" type="submit" value="Update" data-submit-type="update" name="dateUpdateSubmit" style="display: none;float:left;"/>
+                                    <input id="updatedate" type="submit" value="Update" data-submit-type="update" name="dateUpdateSubmit" style="display: none;"/>
+<!--                                    <input type="button" value="Reset" style="display:;float:left;margin-right:10px;"/>-->
                                 </div>
+                                </div>
+                         
                             </form>                       
 
                         </div>
@@ -359,6 +375,7 @@ if (isset($_FILES['user_files'])) {
                                 <div>
                                 <table id = "tb_category" data-dbrecord="date_category">
                                 </table>
+                                 <div><input type="button" value="Add New" onclick ="addRow('tb_category', dateCategories);" /></div>
                                 </div>
                                 <div class="updateBtn">
                                     <input id="updatedate_category" type="submit" value="Update" data-submit-type="update" name="categoryUpdateSubmit" style="display: none;float:left;"/>

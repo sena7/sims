@@ -7,7 +7,7 @@ class date {
     public $id;
     public $name;
     public $date;
-    public $category_id;
+    public $category;
     public $visible;
 
 }
@@ -30,18 +30,18 @@ class image {
 
 }
 
- class config {
+class config {
 
-        public $num_timer;
-        public $slide_show_sec;
-        public $timer_show_sec;
-        public $show_past_times;
-        public $time_type;
+    public $num_timer;
+    public $slide_show_sec;
+    public $timer_show_sec;
+    public $show_past_times;
+    public $time_type;
 
-    }
+}
 
 require('config.php');
-$selectDateSql = "select id, category_id, name, date, visible from date order by date asc ";
+$selectDateSql = "select a.id, b.name category, a.name, a.date, a.visible from date a left join date_category b on b.id = a.category_id order by a.date asc ";
 $selectDateSqlStmt = $pdo->prepare($selectDateSql);
 $selectDateSqlStmt->execute();
 $selectDateResult = $selectDateSqlStmt->fetchAll(PDO::FETCH_CLASS, "date");
@@ -52,7 +52,7 @@ $selectCatSqlStmt = $pdo->prepare($selectCatSql);
 $selectCatSqlStmt->execute();
 $selectCatResult = $selectCatSqlStmt->fetchAll(PDO::FETCH_CLASS, "dateCategory");
 
- $selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec, show_past_times, time_type from system_config where id=(select max(id) from system_config) LIMIT 1";
+$selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec, show_past_times, time_type from system_config where id=(select max(id) from system_config) LIMIT 1";
 $selectSysConfigSqlStmt = $pdo->prepare($selectSysConfigSql);
 $selectSysConfigSqlStmt->execute();
 $config = $selectSysConfigSqlStmt->fetchAll(PDO::FETCH_CLASS, "config");
@@ -94,20 +94,22 @@ if (isset($_POST['action'])) {
         $query->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
         $query->execute();
     }
-
-    if ($_POST['action'] == 'saveImage') {
-
-        $sql = "insert into image (id, order_num, name, file, visible) values ( null, null, 'test', :file, 1)";
-        // (select max(order_num) from image) + :order_num
-        $data = $_POST['data'];
-        echo '<script>console.log("hi");</script>';
-        foreach ($data as $d) {
-            $query->bindParam(':file', $d, PDO::PARAM_LOB);
-            $query = $pdo->prepare($sql);
-            $query->execute();
-        }
-    }
 }
+
+//if (isset($_POST['saveDate'])) {
+//
+//
+//    $sql = "update date SET id=:id, category_id = :category_id, name = :name, date = :date, visible =:visible where id=:id";
+//    // (select max(order_num) from image) + :order_num
+//
+//    $query->bindParam(':category_id', $_POST['saveDate']['category_id'], PDO::PARAM_STR);
+//    $query->bindParam(':name', $_POST['saveDate']['name'], PDO::PARAM_STR);
+//    $query->bindParam(':date', $_POST['saveDate']['date'], PDO::PARAM_STR);
+//    $query->bindParam(':visible', $_POST['saveDate']['visible'], PDO::PARAM_INT);
+//    $query->bindParam(':id', $_POST['saveDate']['id'], PDO::PARAM_INT);
+//    $query = $pdo->prepare($sql);
+//    $query->execute();
+//}
 
 if (isset($_FILES['user_files'])) {
     $files = $_FILES['user_files'];
@@ -115,8 +117,8 @@ if (isset($_FILES['user_files'])) {
     $sql = "insert into image (id, order_num, name, file, visible) values ( null, 4, 'test', :file, 1)";
     if (isset($_FILES['user_files']['tmp_name'])) {
         echo var_dump(count($_FILES['user_files']));
-
-        for ($i = 0; $i < count($_FILES['user_files']); $i ++) {
+         $cnt = count($_FILES['user_files']);
+        for ($i = 0; $i < cnt; $i ++) {
             $fp = fopen($_FILES['user_files']['tmp_name'][$i], 'rb');
 
             $query = $pdo->prepare($sql);
@@ -184,15 +186,23 @@ if (isset($_FILES['user_files'])) {
                 // data retrieved
                 dates = <?php echo json_encode($selectDateResult); ?>;
                 dateCategories = <?php echo json_encode($selectCatResult); ?>;
-                console.log(Object.keys(dates[0])[0]);
+
                 images = <?php echo json_encode($result); ?>;
                 console.log(images);
                 misc = <?php echo json_encode($config); ?>;
                 console.log(misc);
-                setTableWithArray("tb_dates", dates);
-                setTableWithArray("tb_category", dateCategories);
-                setTableWithArray("tb_images", images);
-                setTableWithObject("tb_misc", misc[0]);
+                if (dates) {
+                    setTableWithArray("tb_dates", dates);
+                }
+                if (dateCategories) {
+                    setTableWithArray("tb_category", dateCategories);
+                }
+                if (images) {
+                    setTableWithArray("tb_images", images);
+                }
+                if (misc) {
+                    setTableWithObject("tb_misc", misc[0]);
+                }
 
                 $(".datepicker").datepicker(
                         {
@@ -234,6 +244,17 @@ if (isset($_FILES['user_files'])) {
                             "visible": false}
                     ]
                 });
+
+                var dateFormTest = document.getElementById("dateForm");
+                dateFormTest.addEventListener('submit', function () {
+                    viewFormData(dateFormTest);
+                });
+
+                function viewFormData(dom) {
+                    var form = new FormData(dom);
+                    alert(form.get('action'));
+                }
+
 
 
             });
@@ -328,15 +349,15 @@ if (isset($_FILES['user_files'])) {
                 text-align:left;
             }
             div .updateBtn{
-               
+
             }
             div .buttons div{
                 float:left;
                 margin-top: 10px;
                 margin-right: 10px;
-                
+
             }
-            
+
         </style>
     </head>
     <body>
@@ -353,32 +374,38 @@ if (isset($_FILES['user_files'])) {
                                                     
                                                     
                                                     <legend>Dates</legend>-->
-                            <form id="dateForm">
+                            <form id="dateForm" action="" method="post" enctype="text/plain" name="" action="system_config.php" >
                                 <div><table id="tb_dates" data-dbrecord="date">
-                                       
-                                </table>
+<!--                                        <tr><td><input name="id" value=""></td>
+                                            <td><input name="name" value=""></td>
+                                            <td><input name="date" value=""></td>
+                                            <td><input name="date_category" value=""></td>
+                                            <td><input name="visible" value=""></td>
+                                            <td><input name="" value=""></td></tr>-->
+                                    </table>
                                 </div>
                                 <div class="buttons">
-                                <div><input type="button" value="Add New" onclick ="addRow('tb_dates', dates);" /></div>
-                                <div class="updateBtn">
-                                    <input id="updatedate" type="submit" value="Update" data-submit-type="update" name="dateUpdateSubmit" style="display: none;"/>
-<!--                                    <input type="button" value="Reset" style="display:;float:left;margin-right:10px;"/>-->
+                                    <div><input type="button" value="Add New" onclick ="addRow('tb_dates', dates);" /></div>
+                                    <div class="updateBtn">
+                                        <input id="updatedate" type="submit" value="Save" data-submit-type="update" name="saveDate" style="display: none;" />
+    <!--                                    <input type="button" value="Reset" style="display:;float:left;margin-right:10px;"/>-->
+                                    </div>
                                 </div>
-                                </div>
-                         
+
                             </form>                       
 
                         </div>
                         <h3>Category</h3>
                         <div>
-                            <form id="categoryForm">
+                            <form id="categoryForm" action="saveCategory" method="post" enctype="text/plain">
                                 <div>
-                                <table id = "tb_category" data-dbrecord="date_category">
-                                </table>
-                                 <div><input type="button" value="Add New" onclick ="addRow('tb_category', dateCategories);" /></div>
+                                    <table id = "tb_category" data-dbrecord="date_category">
+                                    </table>
+                                   
                                 </div>
-                                <div class="updateBtn">
-                                    <input id="updatedate_category" type="submit" value="Update" data-submit-type="update" name="categoryUpdateSubmit" style="display: none;float:left;"/>
+                                <div class="buttons">
+                                     <div><input type="button" value="Add New" onclick ="addRow('tb_category', dateCategories);" /></div>
+                                     <div><input id="updatedate_category" type="submit" value="Save" data-submit-type="update" name="categoryUpdateSubmit" style="display: none;float:left;"/></div>
                                 </div>
                             </form>    
 
@@ -387,9 +414,14 @@ if (isset($_FILES['user_files'])) {
 
                         <h3>Misc</h3>
                         <div>
-                            <table id = "tb_misc" data-dbrecord="system_config">
-                            </table>
-
+                            <form>
+                            <div><table id = "tb_misc" data-dbrecord="system_config">
+                                </table>
+                            </div>
+                                <div class="buttons">
+                                     <div><input id="updateConfig" type="submit" value="Save" data-submit-type="update" name="categoryUpdateSubmit" style="display: none;float:left;"/></div>
+                                </div>
+                            </form>
                         </div>
 
                         <h3>Images</h3>
@@ -404,7 +436,7 @@ if (isset($_FILES['user_files'])) {
 
                                         </form>
                                     </div>
-                                    <div><input id="saveImage" type="submit" value="upload" name="imageUploadSubmit" onclick = "" style="display: none;float:left;"/></div>
+                                    <div><input id="saveImage" type="submit" value="upload" name="imageUploadSubmit" style="display: none;float:left;" /></div>
                                     <div>
 
                                         <table id="tb_selectedFiles" ></table>
@@ -417,11 +449,11 @@ if (isset($_FILES['user_files'])) {
                             <fieldset>
                                 <legend>Saved Images</legend>
                                 <div>
-                                    <form id="imageForm" action="updateImage" method="post" enctype="text/plain">
+                                    <form id="imageForm" action="saveImage" method="post" enctype="text/plain">
                                         <div><table id="tb_images" data-dbrecord="image">
-                                        </table>
+                                            </table>
                                         </div>
-                                        <div class="updateBtn"><input id="updateimage" type="submit" value="Update" data-submit-type="update" name="imageUpdateSubmit" style="display: none;float:left;"/>
+                                        <div class="updateBtn"><input id="updateimage" type="submit" value="Save" data-submit-type="update" name="imageUpdateSubmit" style="display: none;float:left;"/>
                                         </div>
                                     </form>    
 
@@ -429,6 +461,60 @@ if (isset($_FILES['user_files'])) {
                             </fieldset>
                         </div>
 
+                        <h3>Test</h3>
+                        <div>
+                            <form>
+                                <table>
+                                    <thead><tr><td>Name</td><td>Date</td><td>Visible</td>
+                                           <td>Category</td>
+                                            <td>delete</td></tr></thead>
+                                    <tbody>
+                                        <?php
+                                        foreach ($selectDateResult as $date) {
+                                            echo "<tr>";
+                                            echo "<td><input type='text' value = '$date->name' style='font-family:inherit;'/ ></td>";
+                                            echo "<td><input type='text' value = '$date->date' style='font-family:inherit;'/></td>";
+                                            echo "<td><input type='text' value = '$date->visible' style='font-family:inherit;'/></td>";
+                                           echo "<td><input type='text' value = '$date->category' style='font-family:inherit;'/></td>";
+                                            echo "<td><input type='button' value ='delete' style='font-family:inherit;'></td>";
+                                            echo "<tr>";
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                        <h3>Form Test</h3>
+                        <div>
+                            <form>
+                                <table>
+                                    <thead>
+                                        <tr><td>Anchor</td></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><a herf="a.com?id='1'" >A</a></td></tr>
+                                        <tr><td><a herf="a.com?id='1'" >B</a></td></tr>
+                                        <tr><td><a herf="a.com?id='1'" >C</a></td></tr>
+                                    </tbody>
+                                </table>
+                            </form>
                         </div>
                         </body>
                         </html>
+
+
+                        <?php
+//if ($_POST['action'] == 'saveImage') {
+//    $sql = "insert into image (id, order_num, name, file, visible) values ( null, null, 'test', :file, 1)";
+//    // (select max(order_num) from image) + :order_num
+//    $data = $_POST['data'];
+//    echo '<script>console.log("hi");</script>';
+//    foreach ($data as $d) {
+//        $query->bindParam(':file', $d, PDO::PARAM_LOB);
+//        $query = $pdo->prepare($sql);
+//        $query->execute();             
+//    }
+//}
+                       
+                        
+                        ?>

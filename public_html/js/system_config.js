@@ -47,114 +47,124 @@ $(document).ready(function () {
 
 
 
-function setTableWithJsonArray(tableId, jsonArray) {
+//function setTableWithJsonArray(tableId, jsonArray) {
+//
+//    var table = document.getElementById(tableId);
+//    var numOfRows = jsonArray.length;
+//    var keys = [];
+//    // get String values of the jsonArray keys
+//    for (var obj in jsonArray) {
+//        if (jsonArray.hasOwnProperty(obj)) {
+//            for (var prop in jsonArray[obj]) {
+//                // if the key string value is not in array 'keys'
+//                if (keys.indexOf(prop.toString()) === -1) {
+//                    // store into 'keys' array    
+//                    keys.push(prop.toString());
+//                }
+//            }
+//        }
+//    }
+//
+//
+//    // create header
+//    var thead = document.createElement("THEAD");
+//    var tr = document.createElement("TR");
+//    for (i = 0; i < keys.length; i++) {
+//        var td = document.createElement("TH");
+//        td.innerHTML = keys[i];
+//        tr.appendChild(td);
+//    }
+//    thead.appendChild(tr);
+//    table.appendChild(thead);
+//    var lengthKeys = keys.length;
+//    var tbody = document.createElement("TBODY");
+//    for (i = 0; i < numOfRows; i++) {
+//        var tr = document.createElement("TR");
+//        for (j = 0; j < lengthKeys; j++) {
+//            var td = document.createElement("TD");
+//            var input = document.createElement("INPUT");
+//            input.setAttribute("class", "fontfamily"); // it would not inherit the body font unless assigned to classes with the certain styles
+//            // set name of input by the json key
+//            input.setAttribute("name", keys[j]);
+//            var value = eval('jsonArray[' + i + '].' + keys[j]);
+//            // set value of input by the json value
+//            input.setAttribute("value", value);
+//            // set class of input 
+//            if (keys[j] === "colour") { // if the key name is colour
+//                input.className += " jscolor"; // set class to jscolor.js colour picker // be aware of the space before the appending class name
+//            }
+//
+//            // set type and special attributes according to the characteristic of the value
+//            // if value is Y or N then 
+//            if (value === "Y" || value === "N") {
+//                input.setAttribute("type", "checkbox");
+//                if (value === "Y") {
+//                    input.setAttribute("checked", true);
+//                }
+//            } else {
+//                input.setAttribute("type", "text");
+//            }
+//            if (keys[j] === "date") {
+//                input.className += " datepicker"; // be aware of the space before the appending class name
+//                // input.setAttribute("data-date-format", "dd/mm/yyyy");
+//            }
+//
+//            //append input to td, td to tr
+//            td.appendChild(input);
+//            tr.appendChild(td);
+//            tbody.appendChild(tr);
+//        }
+//        table.appendChild(tbody);
+//    }
+//}
 
-    var table = document.getElementById(tableId);
-    var numOfRows = jsonArray.length;
-    var keys = [];
-    // get String values of the jsonArray keys
-    for (var obj in jsonArray) {
-        if (jsonArray.hasOwnProperty(obj)) {
-            for (var prop in jsonArray[obj]) {
-                // if the key string value is not in array 'keys'
-                if (keys.indexOf(prop.toString()) === -1) {
-                    // store into 'keys' array    
-                    keys.push(prop.toString());
-                }
-            }
-        }
-    }
-
-
-    // create header
-    var thead = document.createElement("THEAD");
-    var tr = document.createElement("TR");
-    for (i = 0; i < keys.length; i++) {
-        var td = document.createElement("TH");
-        td.innerHTML = keys[i];
-        tr.appendChild(td);
-    }
-    thead.appendChild(tr);
-    table.appendChild(thead);
-    var lengthKeys = keys.length;
-    var tbody = document.createElement("TBODY");
-    for (i = 0; i < numOfRows; i++) {
-        var tr = document.createElement("TR");
-        for (j = 0; j < lengthKeys; j++) {
-            var td = document.createElement("TD");
-            var input = document.createElement("INPUT");
-            input.setAttribute("class", "fontfamily"); // it would not inherit the body font unless assigned to classes with the certain styles
-            // set name of input by the json key
-            input.setAttribute("name", keys[j]);
-            var value = eval('jsonArray[' + i + '].' + keys[j]);
-            // set value of input by the json value
-            input.setAttribute("value", value);
-            // set class of input 
-            if (keys[j] === "colour") { // if the key name is colour
-                input.className += " jscolor"; // set class to jscolor.js colour picker // be aware of the space before the appending class name
-            }
-
-            // set type and special attributes according to the characteristic of the value
-            // if value is Y or N then 
-            if (value === "Y" || value === "N") {
-                input.setAttribute("type", "checkbox");
-                if (value === "Y") {
-                    input.setAttribute("checked", true);
-                }
-            } else {
-                input.setAttribute("type", "text");
-            }
-            if (keys[j] === "date") {
-                input.className += " datepicker"; // be aware of the space before the appending class name
-                // input.setAttribute("data-date-format", "dd/mm/yyyy");
-            }
-
-            //append input to td, td to tr
-            td.appendChild(input);
-            tr.appendChild(td);
-            tbody.appendChild(tr);
-        }
-        table.appendChild(tbody);
-    }
-}
-
-function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
-
-    // table rows array. index 0 = header, index = 1  
-    var rows = document.getElementById(tableId).getElementsByTagName('tr');
-
-    var keys = [];
-    var headers = rows[0].getElementsByTagName('th');
-
-    for (i = 0; i < headers.length; i++) {
-        keys.push(headers[i].textContent);
-    }
-
-
-    var jsonObj = {};
-    var jsonValue = [];
-    for (i = 1; i < rows.length; i++) {
-        // i=0 ; row containing headers. 
-        var values = rows[i].getElementsByTagName(valueContainerName); // hmmmmm
-        //var obj = getModel(valueContainerName);
-        var jsonArrayText = "{";
-        for (j = 0; j < values.length; j++) {
-            jsonArrayText += "\"" + keys[j] + "\"" + ":" + "\"" + values[j].value + "\"";
-            jsonArrayText += j === values.length - 1 ? "}" : ",";
-        }
-
-        jsonValue.push(jsonArrayText);
-    }
-
-    jsonObj = JSON.parse("{" + "\"" + jsonKey + "\"" + ":" + "[" + jsonValue + "]}");
-
-    return jsonObj;
-}
+//function getJsonObjFromTable(tableId, jsonKey, valueContainerName) {
+//
+//    // table rows array. index 0 = header, index = 1  
+//    var rows = document.getElementById(tableId).getElementsByTagName('tr');
+//
+//    var keys = [];
+//    var headers = rows[0].getElementsByTagName('th');
+//
+//    for (i = 0; i < headers.length; i++) {
+//        keys.push(headers[i].textContent);
+//    }
+//
+//
+//    var jsonObj = {};
+//    var jsonValue = [];
+//    for (i = 1; i < rows.length; i++) {
+//        // i=0 ; row containing headers. 
+//        var values = rows[i].getElementsByTagName(valueContainerName); // hmmmmm
+//        //var obj = getModel(valueContainerName);
+//        var jsonArrayText = "{";
+//        for (j = 0; j < values.length; j++) {
+//            jsonArrayText += "\"" + keys[j] + "\"" + ":" + "\"" + values[j].value + "\"";
+//            jsonArrayText += j === values.length - 1 ? "}" : ",";
+//        }
+//
+//        jsonValue.push(jsonArrayText);
+//    }
+//
+//    jsonObj = JSON.parse("{" + "\"" + jsonKey + "\"" + ":" + "[" + jsonValue + "]}");
+//
+//    return jsonObj;
+//}
 
 function setTableWithArray(tableId, list) {
 
     //console.log("fuction setTableWithData(", tableId, ",", Object.keys(list[0]), ")" + " | " + list.length);
-
+    var select = document.createElement('select');
+    select.name = "category";
+    if (dateCategories) {
+        var dateCategoriesLength = dateCategories.length;
+        for (var i = 0; i < dateCategoriesLength; i++) {
+            var option = document.createElement("option");
+            option.value = dateCategories[i].id;
+            option.text = dateCategories[i].name;
+            select.appendChild(option);
+        }
+    }
     var table = document.getElementById(tableId);
     var updateSubmitId = eval('update' + table.dataset.dbrecord).id;
 
@@ -166,7 +176,8 @@ function setTableWithArray(tableId, list) {
     var thead = document.createElement("THEAD");
     var tr = document.createElement("TR");
 
-    for (var i = 0; i < labels.length + 2; i++) {
+    var labelsLength2 = labels.length + 2;
+    for (var i = 0; i < labelsLength2; i++) {
         var td = document.createElement("TH");
         var label = "";
         if (i < labels.length) {
@@ -184,76 +195,95 @@ function setTableWithArray(tableId, list) {
 
     thead.appendChild(tr);
     table.appendChild(thead);
-    for (var i = 0; i < list.length; i++) {
+    
+    var listLength = list.length;
+    for (var i = 0; i < listLength; i++) {
         var obj = list[i];
         var row = tbody.insertRow(i);
         var rowId = tableId + "_row_" + i;
-
+        var child;
         row.id = rowId;
 
         row.dataset.id = list[i].id;
         //row.id = "date" + i;
-        for (var j = 0; j < labels.length; j++) {
+        var labelsLength = labels.length;
+        for (var j = 0; j < labelsLength; j++) {
             var td = row.insertCell(j);
             var label = Object.keys(obj)[j];
-            var child = "";
-
             if (label === "file") {// file , currently just img. DOM img 
                 var img = document.createElement('IMG');
                 img.src = "data:image/jpeg;base64," + images[i].file;
                 img.height = "100";
                 img.class = "slide_image";
-                child = img;
+                
+                td.appendChild(img);
             } else { // any other data type other than file. DOM input
-                var input = document.createElement("INPUT");
-                var id = tableId + '_input_' + i + j;
-                input.id = id;
-                input.style.fontFamily = "inherit";
-                //'Tw Cen MT', Monospace, 'Sans-serif'
-                input.name = Object.keys(obj)[j];
-                var value = eval('obj.' + labels[j]);
-                if (label === "date") {
-                    var date = getJSDate(value);
-                 
+                if (label === "category") {
+                    var selectCopy = select.cloneNode(true);
+                    var id = tableId + '_input_' + i + j;
+                    selectCopy.id = id;
+                    selectCopy.style.fontFamily = "inherit";//'Tw Cen MT', Monospace, 'Sans-serif'
+                    //console.log(obj.category); 
+                    var selectOptionsLength = select.options.length; 
+                    for (var k = 0; k < selectOptionsLength; k++) {
+                        if (selectCopy.options[k].text === obj.category) {
+                            selectCopy.options[k].setAttribute("selected", true);
+                            selectCopy.dataset.initialValue = obj.category;
+                        }
+                    }
+                    //td.appendChild(selectCopy);
+                    child = selectCopy;
+                } else {
+                    var input = document.createElement("INPUT");
+                    var id = tableId + '_input_' + i + j;
+                    input.id = id;
+                    input.style.fontFamily = "inherit";//'Tw Cen MT', Monospace, 'Sans-serif'
+                    input.name = label;
+                    var value = eval('obj.' + labels[j]);
+                    if (label === "date") {
+                        var date = getJSDate(value);
+
 //                    value = date.getUTCDate().toString() + "/" + (adjustedMonth < 10 ? "0" : "") + adjustedMonth.toString() + "/" + date.getUTCFullYear();
 //                    value += " " + (date.getUTCHours() < 10 ? "0" : "") + date.getUTCHours().toString() + ":" + (date.getUTCMinutes() < 10 ? "0" : "") + date.getUTCMinutes().toString() + ":" + (date.getUTCSeconds() < 10 ? "0" : "") + date.getUTCSeconds();
-                    value = date; // you don't need to do the above !
-                    input.className += " flatpickr"; // be aware of the space before the appending class name
-                    input.dataset.enableTime = true;
-                    input.dataset.time24hr = true;
-                    input.dataset.enableSeconds = true;
-                    input.dataset.weekNumbers = true;
-                }
-                input.value = value;
-
-
-                if (label === "colour") { // if the key name is colour
-                    input.className += " jscolor"; // set class to jscolor.js colour picker // be aware of the space before the appending class name
-                }
-
-                if (label === "visible" && (eval('obj.' + labels[j]) === 1 || eval('obj.' + labels[j]) === 0)) {
-                    input.setAttribute("type", "checkbox");
-                    if (eval('obj.' + labels[j]) === 1) {
-                        input.setAttribute("checked", true);
+                        value = date; // you don't need to do the above !
+                        input.className += " flatpickr"; // be aware of the space before the appending class name
+                        input.dataset.enableTime = true;
+                        input.dataset.time24hr = true;
+                        input.dataset.enableSeconds = true;
+                        input.dataset.weekNumbers = true;
                     }
-                } else {
-                    input.setAttribute("type", "text");
-                }
-                input.dataset.initialValue = value;
+                    input.value = value;
 
-                input.addEventListener('focus', function () {
+
+                    if (label === "colour") { // if the key name is colour
+                        input.className += " jscolor"; // set class to jscolor.js colour picker // be aware of the space before the appending class name
+                    }
+
+                    if (label === "visible" && (eval('obj.' + labels[j]) === 1 || eval('obj.' + labels[j]) === 0)) {
+                        input.setAttribute("type", "checkbox");
+                        if (eval('obj.' + labels[j]) === 1) {
+                            input.setAttribute("checked", true);
+                        }
+                    } else {
+                        input.setAttribute("type", "text");
+                    }
+                    input.dataset.initialValue = value;
+                    child = input;
+                }
+                child.addEventListener('focus', function () {
 
                     handleUpdateButton(this.id, updateSubmitId, 'focus');
                 });
-                input.addEventListener('blur', function () {
+                child.addEventListener('blur', function () {
 
                     handleUpdateButton(this.id, updateSubmitId, 'blur');
                 });
+                //td.appendChild(input);
 
-                child = input;
 
+
+                td.appendChild(child);
             }
-            td.appendChild(child);
         }
 
         var singleDeleteBtnCell = row.insertCell();
@@ -282,8 +312,8 @@ function setTableWithArray(tableId, list) {
 function setTableWithObject(tableId, object) {
     var table = document.getElementById(tableId);
     var labels = Object.keys(object);
-    console.log(labels);
-    for (var i = 0; i < labels.length; i++) {
+    var labelsLength = labels.length;
+    for (var i = 0; i < labelsLength; i++) {
         var row = table.insertRow();
         var label = row.insertCell(0);
         var cell = row.insertCell(1);
@@ -293,16 +323,28 @@ function setTableWithObject(tableId, object) {
         var b = a.replace(/sec/gi, "seconds");
         label.innerHTML = b.capitalisedString();
         var input = document.createElement('INPUT');
+        input.id = tableId + '_input_'+i;
         input.name = labels[i];
         input.value = eval('object.' + labels[i]);
+        input.dataset.initialValue = input.value;
         cell.appendChild(input);
+        
+         input.addEventListener('focus', function () {
+
+                    handleUpdateButton(this.id, "updateConfig", 'focus');
+                });
+                input.addEventListener('blur', function () {
+
+                    handleUpdateButton(this.id, "updateConfig", 'blur');
+                });
     }
 
 }
 String.prototype.isWhiteSpace = function () {
     var isWhiteSpace = false;
     var ASCIIwhiteSpaceList = [' ', '\t', '\r', '\n', '\x0b'];
-    for (var i = 0; i < ASCIIwhiteSpaceList.length; i++) {
+    ASCIIwhiteSpaceListLength = ASCIIwhiteSpaceList.length;
+    for (var i = 0; i < ASCIIwhiteSpaceListLength; i++) {
         if (this == ASCIIwhiteSpaceList[i]) {
             isWhiteSpace = true;
             break;
@@ -317,13 +359,13 @@ String.prototype.isWhiteSpace = function () {
 String.prototype.capitalisedString = function () {
     var string = this.trim();
     var spaceIndexArr = [];
-    for (var i = 0; i < string.length; i++) {
+    var stringLength = string.length;
+    for (var i = 0; i < stringLength; i++) {
         if (string.charAt(i).isWhiteSpace()) {
             spaceIndexArr.push(i);
         }
 
     }
-    console.log(spaceIndexArr);
 //    if(spaceIndexArr.length===0){
     string = string.charAt(0).toUpperCase() + string.slice(1);
 //    }else{
@@ -348,13 +390,11 @@ function previewFiles() {
 
     var files = document.querySelector('input[type=file]').files;
     var imgs = document.getElementsByTagName('img');
-    console.log(imgs[0]);
-    //var files = document.querySelector('input[type=file]');
-    console.log(files[0]);
-    var readerList = [];
-    console.log(files.length);
-    for (i = 0; i < files.length; i++) {
 
+    var readerList = [];
+
+    var filesLength = files.length;
+    for (i = 0; i < filesLength; i++) {
         var reader = new FileReader();
         readerList.push(reader);
         var img = document.getElementById('previews' + i.toString());
@@ -365,7 +405,7 @@ function previewFiles() {
             reader.readAsDataURL(files[i]);
         }
     }
-    console.log(readerList);
+
 }
 
 function handleFileSelect(inputFileId) {
@@ -407,11 +447,6 @@ function handleFileSelect(inputFileId) {
 
     var table = document.getElementById('tb_selectedFiles');
     for (var i = 0, f; f = files[i]; i++) {
-        //for (var i = 0, f; f = newFileArray[i]; i++) {
-
-
-        console.log(f);
-        //var row = table.insertRow(fileArray.length);
         var row = table.insertRow();
         var rowId = "row" + i;
         var rowClass = "delete";
@@ -510,16 +545,15 @@ function getFileArray(inputId) {
     console.log("fileList[0]: " + fileList[0]);
     if (fileList.length > 0) {
         for (i = 0, f; f = fileList[i]; i++) {
-            console.log(f);
             fileArray.push(f);
         }
 
     }
     return fileArray;
 }
-//Array.prototype.contains
 
 function deleteRecord(rowElement, tableDataDbrecord) {
+    console.log(rowElement);
     console.log(rowElement.dataset.id);
     rowElement.parentElement.removeChild(rowElement);
 
@@ -535,6 +569,9 @@ function deleteRecord(rowElement, tableDataDbrecord) {
     });
 }
 
+function saveChanges(tableId) {
+
+}
 
 function saveImages(formId) {
 
@@ -559,58 +596,79 @@ function saveImages(formId) {
 }
 
 function handleUpdateButton(inputId, updateSubmitId, eventName) {
-    console.log(inputId, eventName);
     var e = document.getElementById(inputId);
-    
+   // if(e.dataset.initialValue!=="null"){ // somehow, the assigned value was literally null
+       // existing input
     if (eventName === 'focus') {
         document.getElementById(updateSubmitId).style.display = "block";
-    } else if (eventName === 'blur') {
-        console.log(e.value, e.dataset.initialValue);
-        if (e.value === e.dataset.initialValue) {
+     } else if (eventName === 'blur') {
+        if (e.value === e.dataset.initialValue || e.options[e.selectedIndex].text === e.dataset.initialValue) {
             document.getElementById(updateSubmitId).style.display = "none";
         } else {
             document.getElementById(updateSubmitId).style.display = "block";
         }
-    }
+     }
+ //   }else {
+        // new input
+     
+ //   }
 }
 
-function addRow(tableId, list){
-    
+function addRow(tableId, list) {
+
+
     var table = document.getElementById(tableId);
+    console.log('addRow  -table :');
+    console.log(table);
+    var updateSubmitId = eval('update' + table.dataset.dbrecord).id;
     var tbody = table.getElementsByTagName('tbody')[0];
     var labels = Object.keys(list[0]);
     var rowLength = table.rows.length;
-    var row = table.rows[rowLength-1].cloneNode(true);
-    
-    row.className = "even";
-    console.log(row, labels);
-    
-    console.log(row.cells.length);
-    
-    for(var i = 0; i<row.cells.length; i++){
+    var row = table.rows[rowLength - 1].cloneNode(true);
+
+
+    var rowCellsLength = row.cells.length; 
+    for (var i = 0; i < rowCellsLength; i++) {
         var input = row.cells[i].childNodes[0];
-        input.id = tableId + "_input_"+tbody.rows.length.toString()+i;
-        if(input.className.trim()==="flatpickr flatpickr-input"){
+        input.id = tableId + "_input_" + tbody.rows.length.toString() + i;
+        if (input.className.trim() === "flatpickr flatpickr-input") {
             input.className = "flatpickrNew";
         }
-        if(input.className.trim()==="jscolor"){
-            input.style.backgroundColor =null;
+        if (input.className.trim() === "jscolor") {
+            input.style.backgroundColor = null;
         }
         input.value = null;
-        if(labels[i+1]==="date"){}
-        
-        input.style.border = input.type === "text"? "1px solid #5AB0DB":""; // border style
-        input.dataset.initialValue = null;
-        console.log(input);
+        if (labels[i + 1] === "date") {
+        }
+
+        input.style.border = input.type === "text" ? "1px solid #5AB0DB" : ""; // border style
+        input.dataset.initialValue = "";
+        console.log(labels[i]);
+        if (i === labels.length - 1) {
+            input.addEventListener('click', function () {
+                deleteRecord(this.parentElement.parentElement, table.dataset.dbrecord);
+            });
+        }
+        input.addEventListener('focus', function () {
+
+            handleUpdateButton(this.id, updateSubmitId, 'focus');
+        });
+        input.addEventListener('blur', function () {
+
+            handleUpdateButton(this.id, updateSubmitId, 'blur');
+        });
+
+
     }
-   
+
     tbody.appendChild(row);
-   
+    document.getElementById(updateSubmitId).style.display = "block";
+    
     // initialise flatpickrNew class
     $('.flatpickrNew').flatpickr({
         dateFormat: 'd/m/Y H:i:S'
     });
-    
-    
-    
+
+
+
 }

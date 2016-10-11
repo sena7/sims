@@ -1,9 +1,53 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
+
+<?php
+require('config.php');
+
+function getClientIpEnv() {
+    $ipaddress = '';
+    if (getenv('HTTP_CLIENT_IP')) {
+        $ipaddress = getenv('HTTP_CLIENT_IP');
+    } else if (getenv('HTTP_X_FORWARDED_FOR')) {
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    } else if (getenv('HTTP_X_FORWARDED')) {
+        $ipaddress = getenv('HTTP_X_FORWARDED');
+    } else if (getenv('HTTP_FORWARDED_FOR')) {
+        $ipaddress = getenv('HTTP_FORWARDED_FOR');
+    } else if (getenv('HTTP_FORWARDED')) {
+        $ipaddress = getenv('HTTP_FORWARDED');
+    } else if (getenv('REMOTE_ADDR')) {
+        $ipaddress = getenv('REMOTE_ADDR');
+    } else {
+        $ipaddress = 'UNKNOWN';
+    }
+
+    return $ipaddress;
+}
+
+function getClientIpServer() {
+    $ipaddress = '';
+    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+        $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+    } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+        $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+    } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+        $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+    } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+        $ipaddress = $_SERVER['HTTP_FORWARDED'];
+    } else if (isset($_SERVER['REMOTE_ADDR'])) {
+        $ipaddress = $_SERVER['REMOTE_ADDR'];
+    } else {
+        $ipaddress = 'UNKNOWN';
+    }
+
+    return $ipaddress;
+}
+
+
+?>
+
 <html>
     <head>
         <title>SIMS Project</title>
@@ -42,21 +86,22 @@ and open the template in the editor.
                 position: relative;
                 display:inline-block;
                 width:400px;height:400px;
-                padding:20px;
+                padding:0px;
             }
             div.wrapper {
 
             }
             div.section{
                 padding: 25px;
-                margin: auto 0px auto 0px ;
+                margin: auto 0px auto 0px;
+              
                 background-repeat: no-repeat;
                 background-size: auto 100%;
                 background-position: center center;
                 background-origin: content-box;
             }  
             div.section:hover{
-                
+
                 opacity: 0.5;
                 filter: alpha(opacity=50);  
                 /*For IE8 and earlier*/ 
@@ -74,16 +119,16 @@ and open the template in the editor.
 
             }
             div #clock:hover{
-               
+
                 background-image: url('public_html/img/content/clock_face.png');
 
 
             }
             div #config:hover{
-                
+
                 background-image: url('public_html/img/content/home_gear.png');
             }
-           
+
             div #sims:hover p a{
                 transition: color 1.5s ease;
                 color:#fffff;
@@ -93,37 +138,25 @@ and open the template in the editor.
             }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script>
-        
+        <script type="text/javascript">
+            var clientIpEnv;
+            var clientIpServer;
+
+             $(document).ready(function(){
+              
+            });
         </script>
     </head>
     <body>
-        <?php
-// include 'config.php';     
-        
-require('config.php');
-//$sql = "";
-//mysql_query($sql) or die('Error, delete query failed');
-
-
-// config.php custom function. 
-// $db_conn = connectDB();
-// if ($db_conn->connect_error) {
-//    die("Connection failed: " . $db_conn->connect_error);
-// } 
-// echo("<script>console.log($db_conn->server_version);</script>");
-
-
-        ?>
         <div class="container" style="position: absolute; width:99%;height:95%;text-align:center;vertical-align: middle;">
             <div id="simsshow" class="section" style="background-color:#2FAACE">
                 <p><a href="slideshow.php" style="">S</a></p></div>
             <div id="clock" class="section" style="background-color: #4985D6;">
-                <p><a href="timer.php" style="">I</a></p></div>
+                <p><a href="timer2.php" style="">I</a></p></div>
             <div id="config" class="section" style="background-color: #8ADCFF;">
                 <p><a href="system_config.php" style="">M</a></p></div>
             <div id="sims" class="section" style="background-color: #8678E9;">
-                <p><a href="" style="" onmouseover="this.innerHTML = 'SIMS'" onmouseout="this.innerHTML='S'">S</a></p></div>
+                <p><a href="" style="" onmouseover="this.innerHTML = 'SIMS'" onmouseout="this.innerHTML = 'S'">S</a></p></div>
 
         </div>
     </body>

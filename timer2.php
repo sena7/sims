@@ -26,6 +26,7 @@
         public $timer_show_sec;
         public $show_past_times;
         public $time_type;
+        public $show_future_times;
 
     }
 
@@ -49,7 +50,7 @@
     }
 
     // table system_config
-    $selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec, show_past_times, time_type from system_config where id=(select max(id) from system_config) LIMIT 1";
+    $selectSysConfigSql = "select num_timer, slide_show_sec, timer_show_sec, show_past_times, time_type, show_future_times from system_config where id=(select max(id) from system_config) LIMIT 1";
     $selectSysConfigSqlStmt = $pdo->prepare($selectSysConfigSql);
     $selectSysConfigSqlStmt->execute();
     $selectSysConfigResult = $selectSysConfigSqlStmt->fetchAll(PDO::FETCH_CLASS, "config");
@@ -77,21 +78,77 @@
                 var futureDateList = <?php echo json_encode($futureDateList); ?>;
                 var config = <?php echo json_encode($config); ?>;
 
-
                 console.log(config);
-                console.log(config.num_timer);
-                console.log(config.show_past_times);
 
-
-                for (var i = 0; i < config.num_timer; i++) {
+                // set Timer template and 
+                var configNumTimer = config.num_timer;
+                for (var i = 0; i < configNumTimer; i++) {
                     var template = createSimpleTimerTemplate("timerContainer", i);
                     document.getElementById("timer_title" + i).innerHTML = futureDateList[i].name;
                     document.getElementById("timer_date" + i).innerHTML = futureDateList[i].date;
                     timerTemplateList.push(template);
-
-
                 }
 
+                // future and past time containers if they exist and configured to be seen.
+                var timerContainer = document.getElementById("timerContainer");
+                var resContainer = document.createElement('DIV');
+               
+                 
+                var pastDateListLength = pastDateList.length;
+                if (pastDateListLength>0) {
+
+                    var container = document.createElement('DIV');
+                    container.style.margin = '20px 150px 50px 150px';
+                    container.style.fontSize = '0.4em';
+                    container.style.borderRadius = '15px 15px 15px 15px';
+                    container.style.border = '1px solid #DBEADC';
+                    var title = document.createElement('DIV');
+                    title.style.borderRadius = '15px 15px 0px 0px';
+                    title.style.color = '#ffffff';
+                    title.style.backgroundColor = '#DBEADC';
+                    title.textContent = 'Past Go Live Dates';
+                    container.appendChild(title);
+
+                    for (i = 0; i < pastDateListLength; i++) {
+                        var text = pastDateList[i].name + " - " + pastDateList[i].date;
+                        var p = document.createElement('p');
+                        p.innerHTML = text;
+                        container.appendChild(p);
+                    }
+                    
+                    
+                    resContainer.appendChild(container);
+                }
+
+                var futureDateListLength = futureDateList.length;
+                if (config.show_future_times === 1 && futureDateListLength > configNumTimer) {
+
+                    var container = document.createElement('DIV');
+                    container.style.margin = '20px 150px 50px 150px';
+                    container.style.fontSize = '0.4em';
+                    container.style.borderRadius = '15px 15px 15px 15px';
+                    container.style.border = '1px solid #BCB4F3';
+                    var title = document.createElement('DIV');
+                    title.style.borderRadius = '15px 15px 0px 0px';
+                    title.style.color = '#ffffff';
+                    title.style.backgroundColor = '#BCB4F3';
+                    title.textContent = 'Other Go Live Dates';
+                    container.appendChild(title);
+
+                    for (i = configNumTimer; i < futureDateListLength; i++) {
+                        var text = futureDateList[i].name + " - " + futureDateList[i].date;
+                        var p = document.createElement('p');
+                        p.innerHTML = text;
+                        container.appendChild(p);
+                    }
+                    
+                    
+                    resContainer.appendChild(container);
+                }
+
+                timerContainer.appendChild(resContainer);
+
+                // set interval for the countdown timers
                 var interval = setInterval(function () {
                     setTimerValues(futureDateList, config.num_timer, config.time_type);
                 }, 1000);
@@ -153,11 +210,16 @@
 
                 template.dataset.sequence = index;
                 template.id = "timer" + index;
-
+                template.style.borderRadius = '25px 25px 25px 25px';
+                template.style.border = '1px solid #57BCD9';
+                template.style.margin = '20px 150px 50px 150px';
                 var title = document.createElement('DIV');
                 title.id = 'timer_title' + index;
                 title.class = 'timer_title';
-                title.style.color = '#8678E9';
+                title.style.color = '#ffffff';
+                title.style.fontSize = '0.7em';
+                title.style.backgroundColor = "#57BCD9";
+                title.style.borderRadius = '25px 25px 0px 0px';
 
 //                var titleText = document.createTextNode(DueDate.name);
 //                title.appendChild(titleText);
@@ -165,14 +227,15 @@
                 var date = document.createElement('DIV');
                 date.id = 'timer_date' + index;
                 date.class = 'timer_date'
-                date.style.color = '#867800';
+                date.style.color = '#778899';
+                date.style.fontSize = '0.4em';
 //                var dateText = document.createTextNode(DueDate.date);
 //                date.appendChild(dateText);
 
                 var countdown = document.createElement('DIV');
                 countdown.id = 'timer_countdown' + index;
                 countdown.class = 'timer_countdown';
-
+                countdown.style.padding = '0px 0px 30px 0px';
                 template.appendChild(title);
                 template.appendChild(date);
                 template.appendChild(countdown);
@@ -207,70 +270,92 @@
             }
 
             function getJSDate(dbDateTime) {
-                // ******* dbDateTime type should be time stamp
-                return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
+
+                //console.log("Date.parse(dbDateTime.replace('/-/g', '-')): " + Date.parse(dbDateTime.replace('/-/g', '-')));
+                //console.log("Date.parse(dbDateTime.replace('/-/g', '-').toString()+' GMT+0100'): " + Date.parse(dbDateTime.replace('/-/g', '-').toString()+" GMT+0100"));
+                //console.log("Date.parse(dbDateTime.replace('/-/g', '-')).getTime(): " + Date.parse(dbDateTime.replace('/-/g', '-')));
+                var d = new Date();
+                var offset = d.getTimezoneOffset();
+                var utcMs = Date.parse(dbDateTime.replace('/-/g', '-')) + offset * 60 * 1000;
+                //console.log("getTimezoneOffset(): " + d.getTimezoneOffset());
+                //console.log("Date.parse(dbDateTime.replace('/-/g', '-')) + offset*60*1000 :  " + utcMs);
+                return new Date(utcMs);
+                //return  new Date(Date.parse(dbDateTime.replace('-', '/', 'g')));
             }
 
             function writeTime(element, jsDate, mode) {
-                
+                //console.log(mode);
                 var time = new TimeDHMS(jsDate);
                 if (mode === "dhms") {
 
                     element.innerHTML = getStringValue(time.day, "day") + " " + time.hour + "h " + time.minute + "m " + time.second + "s";
                 }
                 if (mode === "ymdhms") {
-                    console.log(time.day%365);
+                    //console.log(time.day%365);
                     var MonthAndDay = new getMonthAndDay(new Date(), jsDate, time.day % 365);
-                    
-                    element.innerHTML = getStringValue(Math.floor(time.day/365), "year") + " "
-                                      + getStringValue(MonthAndDay.monthCount, "month") + " "
-                                      + getStringValue(MonthAndDay.daysLeft, "day") + " "
+
+                    element.innerHTML = getStringValue(Math.floor(time.day / 365), "year") + " "
+                            + getStringValue(MonthAndDay.monthCount, "month") + " "
+                            + getStringValue(MonthAndDay.daysLeft, "day") + " "
                             + time.hour + "h " + time.minute + "m " + time.second + "s";
                 }
 
                 function getStringValue(value, unit) {
-                     if (value === 1) {
+                    if (value === 1) {
                         return value.toString() + " " + unit;
-                    } else if(value > 1){
+                    } else if (value > 1) {
                         return value.toString() + " " + unit + "s";
                     } else {
                         return "";
-                    } 
+                    }
                 }
 
 
 
                 function getMonthAndDay(fromDate, toDate, daysLeft) {
-                    
+
                     var daysInMonthArr = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
                     this.monthCount = 0;
                     this.daysLeft = 0;
-                    
-                                      
+
+
                     var futureMonthIndex = toDate.getUTCMonth();
                     var currentMonthIndex = fromDate.getUTCMonth();
+                    console.log("currentMonthIndex: " + currentMonthIndex + ", " + "futureMonthIndex" + futureMonthIndex);
+                    var monthCnt = 0;
 
-                          var monthCnt = 0;
-                          var daysInMonthCnt = 0;
-                          for(var i = currentMonthIndex+1; i< 12; i++ ){
-                              monthCnt += 1;
-                              daysInMonthCnt += daysInMonthArr[i];
-                          }
-                          for(var i = 0; i<futureMonthIndex; i++){
-                              monthCnt += 1;
-                              daysInMonthCnt += daysInMonthArr[i];
-                          }
-                          
-                          var daysInCurrentMonth = daysInMonthArr[currentMonthIndex];
-                          var daysLeftTmp = daysLeft - daysInMonthCnt;
-                          
-                          if(daysLeftTmp > daysInCurrentMonth){
-                              monthCnt +=1;
-                              daysInMonthCnt +=daysInCurrentMonth;
-                          }
-                          
-                          this.monthCount = monthCnt;
-                          this.daysLeft = daysLeft - daysInMonthCnt;
+                    if (currentMonthIndex === futureMonthIndex) {
+                        this.daysLeft = toDate.getUTCDate() - fromDate.getUTCDate();
+
+                    } else {
+                        var daysInMonthCnt = 0;
+                        if (currentMonthIndex > futureMonthIndex) {
+                            for (var i = currentMonthIndex + 1; i < 12; i++) {
+                                monthCnt += 1;
+                                daysInMonthCnt += daysInMonthArr[i];
+                            }
+                            for (var i = 0; i < futureMonthIndex; i++) {
+                                monthCnt += 1;
+                                daysInMonthCnt += daysInMonthArr[i];
+                            }
+                        } else if (currentMonthIndex < futureMonthIndex) {
+                            for (var i = currentMonthIndex + 1; i < futureMonthIndex; i++) {
+                                monthCnt += 1;
+                                daysInMonthCnt += daysInMonthArr[i];
+                            }
+                        }
+                        var daysInCurrentMonth = daysInMonthArr[currentMonthIndex];
+                        var daysLeftTmp = daysLeft - daysInMonthCnt;
+
+                        if (daysLeftTmp > daysInCurrentMonth) {
+                            monthCnt += 1;
+                            daysInMonthCnt += daysInCurrentMonth;
+                        }
+                        this.monthCount = monthCnt;
+                        this.daysLeft = daysLeft - daysInMonthCnt;
+                    }
+
+
 
                 }
             }

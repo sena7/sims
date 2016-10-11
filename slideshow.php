@@ -55,14 +55,16 @@ foreach ($result as $row) {
                
                
                 images = <?php echo json_encode($result); ?>;
+                var imagesLength = images.length;
                 var list = [];
-                for(var i = 0; i<images.length; i++){
+                for(var i = 0; i< imagesLength; i++){
                     list.push("data:image/jpeg;base64,"+ images[i].file);
                 }              
                 console.log(list);        
-                        
+                
                 var img_container = document.getElementById("img_container");
-                for (i = 0; i < list.length; i++) {
+                var listLength = list.length;
+                for (i = 0; i < listLength; i++) {
                     var img = document.createElement('IMG');
                     img.setAttribute("src", list[i]);
                     img.setAttribute("id", "img" + i);
@@ -84,7 +86,7 @@ foreach ($result as $row) {
               
                 var timeout;
                 var imgs = document.getElementsByClassName("mySlides");
-                console.log(imgs.length);
+                var imgsLength = imgs.length;
 
                 slide();
 
@@ -93,17 +95,17 @@ foreach ($result as $row) {
                     var i;
 
 
-                    for (i = 0; i < imgs.length; i++) {
+                    for (i = 0; i < imgsLength; i++) {
                         imgs[i].style.display = "none";
                     }
 
-                    if (myIndex < imgs.length) {
+                    if (myIndex < imgsLength) {
                         imgs[myIndex].style.display = "block";
                         document.getElementById("timer_container").style.display = "none";
                         timeout = setTimeout(slide, slideShowTime);
                         myIndex++;
 
-                    } else if (myIndex >= imgs.length) {
+                    } else if (myIndex >= imgsLength) {
 
                         myIndex = 0;
                         clearTimeout(timeout);
@@ -184,12 +186,9 @@ foreach ($result as $row) {
 
     </head>
     <body>
-        <?php
-         echo $_SERVER['HTTP_HOST'];
-         echo "<script>console.log($_SERVER.$GLOBALS);</script>";
-        ?>
+       
         <div id = "container" style="">
-            <div id="config" style="position:absolute; z-index: 1;text-align: right;margin: 0; padding:10px;"><input style="width:5%; max-width: 40px;outline:none;" type="image" src="https://s19.postimg.org/jd32a42f7/config.png" alt="config"/></div>
+            <div id="config" style="position:absolute; z-index: 1;text-align: right;margin: 0; padding:10px;"><input style="width:5%; max-width: 40px;outline:none;" type="image" src="https://s19.postimg.org/jd32a42f7/config.png" alt="config" onclick="window.location='/sims/system_config.php';"/></div>
             <!--position:relative;overflow:hidden; -->
             <div id="img_container" style="position:absolute;overflow:hidden;margin:auto;">
                 <!--padding:10px;max-height:100%;overflow:hidden;vertical-align:middle; text-align:center;position:relative;overflow:auto; -->
@@ -197,7 +196,7 @@ foreach ($result as $row) {
             </div> 
             <div id="timer_container" style="position:absolute;margin: auto;-webkit-animation: fadeIn 5s;animation: fadeIn 5s;" >
                 <!--width:50%;height:100%;overflow:hidden;display:none;position:absolute; -->
-                <object id="timer" type="text/html" data="timer.php"
+                <object id="timer" type="text/html" data="timer2.php"
                         style="width: 100%;height:100%;">
                     <!-- max-width: 100%;
                          max-height: 100%; overflow:hidden;  -->

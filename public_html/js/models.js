@@ -80,11 +80,8 @@ function getModel(name) {
 function TimeDHMS(jsDate) {
     var dateMs = jsDate.getTime();
 
-
-    var dateNow = Date.now();
-    console.log(dateNow);
     var remainMs = dateMs - Date.now();
-    console.log(remainMs);
+    //console.log(remainMs);
 
     var ms = 1;
     var s = ms * 1000;
@@ -100,7 +97,7 @@ function TimeDHMS(jsDate) {
     this.minute = Math.floor(((remainMs % d) % h) / m);
     this.second = Math.floor((((remainMs % d) % h) % m) / s);
 
-    console.log(this.day, this.hour, this.minute, this.second);
+    //console.log(this.day, this.hour, this.minute, this.second);
 
 
 }
